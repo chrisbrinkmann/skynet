@@ -15,20 +15,55 @@ This app will implement the basic features of a modern social network site. User
 - React - version 16.9
 - Node - version 10.16.2
 - Express - version 4.17.1
+- Sequelize - version 5.19.1
 - PostgreSQL - version 11.5
 
 ## Demo
 A live working demo will be deployed to Heroku.
 
 ## Development Setup
-To clone and build this application, you'll need [Git](https://git-scm.com) and [Node.js](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)) installed on your computer. From your command line:
+To clone and build this application, you'll need [Git](https://git-scm.com), [Node.js](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)), and [PostgreSQL](https://www.postgresql.org/download/) installed on your computer.
 
-### Cloning the repo:
+### Cloning the Repo:
 ```bash
 $ git clone https://github.com/chrisbrinkmann/skynet.git
 ```
 
-### Starting the server:
+### Setting Up A Local DB:
+If Using Windows, add path to the bin folder where psql.exe was installed to Windows Path environemnt variable.
+
+#### Create a local DB named 'skynet'
+```bash
+# Navigate to the repository root
+$ cd skynet
+
+# Run script to create the DB
+$ npm run createdb
+
+# If your Postgres username is something other than 'postgres', you will first need to replace 'postgres' with your username in the 'createdb' script in package.json (createdb -O <username> -U <username> skynet)
+```
+
+#### Postgres GUIs
+GUI clients can be used to connect to the database, and provide many useful tools for viewing and manipulating data. Here are a few of the many ones available.
+
+Windows:
+- pgAdmin (comes with Postgres)
+- [dbeaver](https://dbeaver.io/download/)
+
+Mac:
+- [PSequel](http://www.psequel.com)
+
+### Setting Up Environment Variables:
+/config/.env is a template that has all of the variables needed by the app. It has some initial values already set for convenience.
+
+You will need to setup your own local environment variables. To do this:
+
+- Create a new file named '.env.local' in the config directory.
+- Copy the contents of the '.env' file into '.env.local'.
+- Add your Postgres username and password
+- If needed, adjust any other variables for your local environment.
+
+### Starting the Server:
 ```bash
 # Navigate to the repository root
 $ cd skynet
@@ -37,9 +72,9 @@ $ cd skynet
 $ npm i
 
 # Start the server
-$ npm start
+$ npm run server
 ```
-### Starting the client:
+### Starting the Client:
 Open a second terminal window
 ```bash
 # Navigate to the client directory
@@ -52,90 +87,4 @@ $ npm i
 $ npm start
 ```
 
-### Setting Up A Local DB
-
-#### Download & Install PostgreSQL v11.5 https://www.postgresql.org/download/
-
-#### Following the installation wizard:
-- Use default port: 5432
-- Use default superuser: postgres
-- Be sure to save your password, you will need it to connect to the DB.
-
-#### If using Windows:
-Add path to bin folder where psql.exe was installed to Windows Path environemnt variable.
-
-
-#### Create a new DB named "skynet" with owner/user "postgres":
-```bash
-$ createdb -O <user> -U <user> <db_name>
-```
-
-#### Connect to local Postgres server with user "postgres" (starts psql shell):
-```bash
-$ psql -U <user>
-```
-
-#### Connect to the "skynet" DB from the psql shell:
-```psql
-postgres=# \c <db_name>
-```
-
-Once connected to the skynet DB, you can run SQL commands on it. Run the following SQL commands to generate the tables used by this app:
-
-```SQL
-/** Drop any existing tables */
-
-DROP TABLE IF EXISTS comments;
-DROP TABLE IF EXISTS posts;
-DROP TABLE IF EXISTS relations;
-DROP TABLE IF EXISTS users;
-
-/** Create tables */
-
-CREATE TABLE users (
-  id SERIAL PRIMARY KEY,
-  name TEXT NOT NULL,
-  email TEXT UNIQUE NOT NULL,
-  avatar TEXT,
-  bio TEXT,
-  password TEXT NOT NULL,
-  joined DATE DEFAULT CURRENT_DATE
-);
-
-CREATE TABLE relations (
-  first_user_id INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-  second_user_id INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-  relation TEXT DEFAULT 'none',
-  CONSTRAINT valid_relation CHECK (relation = 'none' OR relation ='pending_first_second' OR relation = 'pending_second_first' OR relation = 'friends'),
-  PRIMARY KEY (first_user_id, second_user_id)
-);
-
-CREATE TABLE posts (
-  id SERIAL PRIMARY KEY,
-  user_id INTEGER REFERENCES users (id) ON DELETE CASCADE,
-  contents TEXT NOT NULL,
-  created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE comments (
-  id SERIAL PRIMARY KEY,
-  parent_post_id INTEGER REFERENCES posts (id) ON DELETE CASCADE,
-  user_id INTEGER REFERENCES users (id) ON DELETE CASCADE,
-  content TEXT NOT NULL,
-  created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-#### Postgres GUIs
-Connecting to the DB, and running SQL commands can be done thru the command line as described above, or thru a GUI client. GUI clients may be more convenient for running scripts, and provide additional tools for viewing and manipulating data. There are many options for GUI clients.
-
-Windows:
-- pgAdmin (comes with Postgres)
-- [dbeaver](https://dbeaver.io/download/)
-
-Mac:
-- PSequel 
-
-
 ## Testing
-

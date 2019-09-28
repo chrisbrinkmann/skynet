@@ -4,7 +4,8 @@
   "description": "Social network app",
   "main": "index.js",
   "scripts": {
-    "start": "node src/server.js"
+    "createdb": "createdb -O postgres -U postgres skynet",
+    "server": "nodemon -r dotenv/config src/server.js dotenv_config_path=./config/.env.local"
   },
   "author": "Chris Brinkmann, Min Ko, Peter Le",
   "license": "ISC",

@@ -86,5 +86,14 @@ $ npm i
 # Start the app
 $ npm start
 ```
+### Testing in the Client:
+Open a new terminal window
+```bash
+# Navigate to the client directory
+$ cd skynet/client
+
+# Run command to run current tests implemented
+$ npm test -- --watchAll
+```
 
 ## Testing

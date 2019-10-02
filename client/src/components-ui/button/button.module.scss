@@ -1,0 +1,83 @@
+@import '../../styles/global.styles';
+
+// BUTTON
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 3rem;
+  width: 100%;
+
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: $other-font;
+  font-size: 1.3rem;
+  
+  background: $primary-color;
+  color: $white;
+  border: none;
+
+  &:hover {
+    background: lighten($primary-color, 7%);
+  }
+
+  // SMALL
+  &.small {
+    height: 2rem;
+    font-size: 1.2rem;
+  }
+
+  // INVERTED
+  &.inverted {
+    background: $white;
+    color: $primary-color;
+    border: 1px solid $primary-color;
+
+    &:hover {
+      background: $primary-color;
+      color: $white;
+      border: none;
+    }
+  }
+
+  // SUCCESS
+  &.success {
+    background: $success;
+    color: $white;
+    border: none;
+
+    &:hover {
+      background: lighten($success, 7%);
+    }
+  }
+
+  // DANGER
+  &.danger {
+    background: $danger;
+    color: $white;
+    border: none;
+
+    &:hover {
+      background: lighten($danger, 7%);
+    }
+  }
+
+  // WARNING
+  &.warning {
+    background: $warning;
+    color: $white;
+    border: none;
+
+    &:hover {
+      background: lighten($warning, 7%);
+    }
+  }
+}
+
+// ********************************** MEDIA QUERIES ********************************** //
+@media screen and (min-width: 500px) {
+  .button {
+    width: 15rem;
+  }
+}

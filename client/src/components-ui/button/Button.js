@@ -4,11 +4,11 @@ import style from './button.module.scss';
 // *************************** BUTTON COMPONENT *************************** //
 const Button = ({ small, inverted, success, danger, warning, children, ...otherProps }) => {
   // destructured props will be passed down via parent component (determines size / color / children / otherProps)
-  // size and color variables can be chained together (ie. small success)
+  // size and color variables can be chained together
   return (
-    <button 
+    <button
       className={`
-        ${small ? style.small : ''}
+        ${small  ? style.small : ''}
         ${inverted ? style.inverted : ''}
         ${success ? style.success : ''}
         ${danger ? style.danger : ''}

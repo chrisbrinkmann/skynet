@@ -1,0 +1,24 @@
+@import '../../styles/global.styles';
+
+// FORM INPUT
+.input {
+  height: 3rem;
+  width: 100%;
+  margin-bottom: 0.5rem;
+  padding: 0 0.5rem;
+
+  // SMALL
+  &.small {
+    width: 10rem;
+    height: 2rem;
+    font-size: 1.2rem;
+    margin-bottom: 0;
+  }
+}
+
+// ********************************** MEDIA QUERIES ********************************** //
+@media screen and (min-width: 500px) {
+  .input {
+    width: 25rem;
+  }
+}

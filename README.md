@@ -40,7 +40,9 @@ $ cd skynet
 # Run script to create the DB
 $ npm run createdb
 
-# If your Postgres username is something other than 'postgres', you will first need to replace 'postgres' with your username in the 'createdb' script in package.json (createdb -O <username> -U <username> skynet)
+# Enter your password when prompted
+
+# If your Postgres username is something other than 'postgres', # you will first need to replace 'postgres' with your username  # in the 'createdb' script in package.json (createdb -O         # <username> -U <username> skynet)
 ```
 
 #### Postgres GUIs
@@ -53,13 +55,13 @@ Windows:
 Mac:
 - [PSequel](http://www.psequel.com)
 
-### Setting Up Environment Variables:
+### Setting Up Local Environment Variables:
 /config/.env is a template that has all of the variables needed by the app. It has some initial values already set for convenience.
 
 You will need to setup your own local environment variables. To do this:
 
-- Create a new file named '.env.local' in the config directory.
-- Copy the contents of the '.env' file into '.env.local'.
+- Create a new file named `.env.local` in the config directory.
+- Copy the contents of the `.env` file into `.env.local`.
 - Add your Postgres username and password
 - If needed, adjust any other variables for your local environment.
 
@@ -86,14 +88,49 @@ $ npm i
 # Start the app
 $ npm start
 ```
-### Testing in the Client:
-Open a new terminal window
+
+## Testing
+
+### Testing the Client:
 ```bash
 # Navigate to the client directory
 $ cd skynet/client
 
-# Run command to run current tests implemented
+# Run tests
 $ npm test -- --watchAll
 ```
 
-## Testing
+### Testing the Server:
+
+First you will need to setup environment varibales for testing. To do this:
+
+- Create a new file named `.env.test` in the config directory
+- Copy the contents of the `.env` file into `.env.test`
+- Change the value of variable `DB_NAME` from `skynet` to `skynet-test`
+- Add your Postgres username and password
+- If needed, adjust any other variables for your testing environment
+
+#### Create a local DB named 'skynet-test'
+
+You will only need to run this createdb-test script once, unless you drop the database.
+
+```bash
+# Navigate to the repository root
+$ cd skynet
+
+# Run script to create the DB
+$ npm run createdb-test
+
+# Enter your password when prompted
+
+# If your Postgres username is something other than 'postgres', # you will first need to replace 'postgres' with your username  # in the 'createdb-test' script in package.json (createdb -O    # <username> -U <username> skynet-test)
+```
+Running the tests:
+
+```bash
+# Navigate to the root directory
+$ cd skynet
+
+# Run tests
+$ npm test
+```

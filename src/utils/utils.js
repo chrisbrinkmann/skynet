@@ -35,7 +35,19 @@ const registerValidatorChecks = () => {
   ]
 }
 
-// generate a url for an avatar 
+// returns an array off express-validator checks
+const loginValidatorChecks = () => {
+  return [
+    check('email', 'Please include a valid email')
+      .isEmail()
+      .normalizeEmail(),
+    check('password', 'Password is required')
+      .not()
+      .isEmpty()
+  ]
+}
+
+// generate a url for an avatar
 const setAvatar = email => {
   return gravatar.url(email, {
     s: '200', // size
@@ -48,5 +60,6 @@ module.exports = {
   createAuthToken,
   createUser,
   registerValidatorChecks,
+  loginValidatorChecks,
   setAvatar
 }

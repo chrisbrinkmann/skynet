@@ -7,7 +7,8 @@ const {
   setAvatar,
   createAuthToken,
   createUser,
-  registerValidatorChecks
+  registerValidatorChecks,
+  loginValidatorChecks
 } = require('../utils/utils')
 
 // register a new user, returns a JWT
@@ -39,6 +40,42 @@ router.post('/register', registerValidatorChecks(), async (req, res) => {
     const token = createAuthToken(user.dataValues)
 
     res.status(201).json({ token }) // send token res
+  } catch (err) {
+    res.status(400).send(err)
+  }
+})
+
+// login existing user
+router.post('/login', loginValidatorChecks(), async (req, res) => {
+  const errors = validationResult(req) // run checks on req
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() })
+  }
+
+  const { email, password } = req.body // cache req data
+
+  try {
+    // check for existing user with req email
+    let user = await User.findOne({ where: { email } })
+
+    if (!user) {
+      return res.status(400).json({
+        errors: [{ msg: 'Invalid credentials' }]
+      })
+    }
+
+    // compare req password with user password
+    const isMatch = await bcrypt.compare(password, user.password)
+
+    if (!isMatch) {
+      return res.status(400).json({
+        errors: [{ msg: 'Invalid credentials' }]
+      })
+    }
+
+    const token = createAuthToken(user.dataValues)
+
+    res.status(200).json({ token }) // send token res
   } catch (err) {
     res.status(400).send(err)
   }

@@ -1,0 +1,21 @@
+@import '../../styles/global.styles';
+
+// SIGN UP FORM
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+// ********************************** MEDIA QUERIES ********************************** //
+@media screen and (min-width: 500px) {
+  .form {
+
+  }
+}
+
+// 800px MEDIA QUERY
+@media screen and (min-width: 800px) {
+  .form {
+
+  }
+}

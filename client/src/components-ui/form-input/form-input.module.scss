@@ -13,6 +13,7 @@
     height: 2rem;
     font-size: 1.2rem;
     margin-bottom: 0;
+    margin-right: 0.5rem;
   }
 }
 
@@ -20,5 +21,16 @@
 @media screen and (min-width: 500px) {
   .input {
     width: 25rem;
+
+    &.small {
+      width: 15rem;
+    }
+  }
+}
+
+// 800px MEDIA QUERY
+@media screen and (min-width: 800px) {
+  .input {
+    
   }
 }

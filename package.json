@@ -7,7 +7,7 @@
     "createdb": "createdb -O postgres -U postgres skynet",
     "createdb-test": "createdb -O postgres -U postgres skynet-test",
     "server": "nodemon -r dotenv/config src/server.js dotenv_config_path=./config/.env.local",
-    "test": "jest --watch --i"
+    "test": "jest --watch --i --verbose"
   },
   "jest": {
     "setupFiles": [

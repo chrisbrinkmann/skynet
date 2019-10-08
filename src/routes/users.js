@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs')
 const { validationResult } = require('express-validator')
 const router = express.Router()
 const User = require('../models/User')
+const auth = require('../middleware/auth')
 const {
   setAvatar,
   createAuthToken,
@@ -82,9 +83,9 @@ router.post('/login', loginValidatorChecks(), async (req, res) => {
 })
 
 // get all users
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
   try {
-    const users = await User.findAll()
+    let users = await User.findAll({ attributes: { exclude: ['password']}})
 
     res.status(200).json(users)
   } catch (err) {

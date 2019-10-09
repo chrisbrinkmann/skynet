@@ -21,7 +21,8 @@ const Comment = db.define('comment', {
     allowNull: false
   },
   content: {
-    type: Sequelize.TEXT
+    type: Sequelize.TEXT,
+    allowNull: false
   }
 })
 

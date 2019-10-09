@@ -1,9 +1,76 @@
 @import '../../styles/global.styles';
 
 // SIGN UP FORM
-.form {
-  display: flex;
-  flex-direction: column;
+.signup {
+  margin-bottom: 2rem;
+  padding: 0 1rem;
+
+  // HEADER
+  .header {
+    margin-bottom: 2rem;
+    text-align: center;
+
+    .title {
+      margin-bottom: 0;
+      font-size: 2.8rem;
+      font-weight: bold;
+      color: $primary-color;
+    }
+
+    .subtitle {
+      margin-top: 0.5rem;
+      font-weight: lighter;
+      color: $grey;
+      font-size: 1.6rem;
+    }
+  }
+
+  // FORM
+  .form {
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 // ********************************** MEDIA QUERIES ********************************** //
+@media screen and (min-width: 500px) {
+  .signup {
+    margin-left: auto;
+    margin-right: auto;
+
+    // HEADER
+    .header {
+
+      .title {
+        font-size: 3rem;
+      }
+
+      .subtitle {
+        font-size: 1.6rem;
+      }
+    }
+  }
+}
+
+// 800px MEDIA QUERY
+@media screen and (min-width: 800px) {
+  .signup {
+    width: 50%;
+    margin-left: 5rem;
+    margin-right: 0;
+    margin-bottom: 0;
+
+    // HEADER
+    .header {
+      text-align: justify;
+
+      .title {
+        font-size: 3.6rem;
+      }
+  
+      .subtitle {
+        font-size: 1.8rem;
+      }
+    }
+  }
+}

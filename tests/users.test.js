@@ -1,10 +1,9 @@
 const request = require('supertest')
 const app = require('../src/app')
 const User = require('../src/models/User')
-const { syncDatabase, populateTables, sampleUsers } = require('./fixtures/db')
+const { syncDatabase, sampleUserData } = require('./fixtures/db')
 
-beforeAll(syncDatabase)
-beforeEach(populateTables)
+beforeEach(syncDatabase)
 
 /**
  * Register user endpoint tests
@@ -33,10 +32,10 @@ test('Should register/insert new user when data is valid', async () => {
 test('Should not register existing user', async () => {
   await request(app)
     .post('/users/register')
-    .send(sampleUsers[0])
+    .send(sampleUserData[0])
     .expect(400) // assert http res code
 
-  const user = await User.findOne({ where: { email: sampleUsers[0].email } })
+  const user = await User.findOne({ where: { email: sampleUserData[0].email } })
   expect(user).not.toBeNull() // confirm registering user exists in db
 })
 
@@ -90,12 +89,12 @@ test('Should login an existing user when credentials are valid', async () => {
   const response = await request(app)
     .post('/users/login')
     .send({
-      email: sampleUsers[0].email,
-      password: sampleUsers[0].password
+      email: sampleUserData[0].email,
+      password: sampleUserData[0].password
     })
     .expect(200) // assert http res code
 
-  const user = await User.findOne({ where: { email: sampleUsers[0].email } })
+  const user = await User.findOne({ where: { email: sampleUserData[0].email } })
   expect(user).not.toBeNull() // confirm login user exists in db
 
   // assert response object contains token
@@ -106,12 +105,12 @@ test('Should not login an existing user when password is wrong', async () => {
   const response = await request(app)
     .post('/users/login')
     .send({
-      email: sampleUsers[1].email,
+      email: sampleUserData[1].email,
       password: 'wrongpassword'
     })
     .expect(400) // assert http res code
 
-  const user = await User.findOne({ where: { email: sampleUsers[1].email } })
+  const user = await User.findOne({ where: { email: sampleUserData[1].email } })
   expect(user).not.toBeNull() // confirm login user exists in db
 
   // assert response object does not contain token

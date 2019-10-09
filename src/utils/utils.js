@@ -47,6 +47,14 @@ const loginValidatorChecks = () => {
   ]
 }
 
+const createPostValidatorChecks = () => {
+  return [
+    check('content', 'content is required')
+      .not()
+      .isEmpty()
+  ]
+}
+
 // generate a url for an avatar
 const setAvatar = email => {
   return gravatar.url(email, {
@@ -61,5 +69,6 @@ module.exports = {
   createUser,
   registerValidatorChecks,
   loginValidatorChecks,
+  createPostValidatorChecks,
   setAvatar
 }

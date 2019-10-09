@@ -12,7 +12,8 @@ const Post = db.define('post', {
     allowNull: false
   },
   content: {
-    type: Sequelize.TEXT
+    type: Sequelize.TEXT,
+    allowNull: false
   }
 })
 

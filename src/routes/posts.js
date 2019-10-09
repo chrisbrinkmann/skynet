@@ -3,10 +3,10 @@ const router = express.Router()
 const { validationResult } = require('express-validator')
 const Post = require('../models/Post')
 const auth = require('../middleware/auth')
-const { createPostValidatorChecks } = require('../utils/utils')
+const { contentValidatorChecks } = require('../utils/utils')
 
 // create new post
-router.post('/new', [auth, createPostValidatorChecks()], async (req, res) => {
+router.post('/new', [auth, contentValidatorChecks()], async (req, res) => {
     const errors = validationResult(req) // run checks on req
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() })

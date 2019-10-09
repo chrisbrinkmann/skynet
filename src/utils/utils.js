@@ -47,7 +47,7 @@ const loginValidatorChecks = () => {
   ]
 }
 
-const createPostValidatorChecks = () => {
+const contentValidatorChecks = () => {
   return [
     check('content', 'content is required')
       .not()
@@ -69,6 +69,6 @@ module.exports = {
   createUser,
   registerValidatorChecks,
   loginValidatorChecks,
-  createPostValidatorChecks,
+  contentValidatorChecks,
   setAvatar
 }

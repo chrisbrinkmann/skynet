@@ -8,6 +8,14 @@
 
   padding: 1rem;
 
+  // LANDING
+  &.landing {
+    display: flex;
+    flex-direction: column;
+    padding-top: 1rem;
+  }
+
+  // NOT FOUND
   &.notfound {
     display: flex;
     align-items: center;
@@ -27,5 +35,10 @@
 @media screen and (min-width: 800px) {
   .container {
     padding: 0;
+
+    // LANDING PAGE
+    &.landing {
+      flex-direction: row;
+    }
   }
 }

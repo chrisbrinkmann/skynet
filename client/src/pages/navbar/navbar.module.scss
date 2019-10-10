@@ -1,0 +1,55 @@
+@import '../../styles/global.styles';
+
+// NAVBAR
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+
+  padding: 1rem;
+
+  .logo {
+    text-transform: uppercase;
+    color: $primary-color;
+  }
+
+  .guestLinks {
+    display: flex;
+    align-items: center;
+  }
+
+  .links {
+    display: flex;
+    align-items: center;
+    list-style: none;
+
+    .link {
+      margin-left: 1rem;
+      text-transform: uppercase;
+      color: $primary-color;
+      cursor: pointer;
+    }
+
+    .active {
+
+    }
+  }
+}
+
+// ********************************** MEDIA QUERIES ********************************** //
+@media screen and (min-width: 500px) {
+  .navbar {
+
+  }
+}
+
+// 800px MEDIA QUERY
+@media screen and (min-width: 800px) {
+  .navbar {
+    padding: 1rem 0;
+  }
+}

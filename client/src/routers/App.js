@@ -1,6 +1,7 @@
 import React, { } from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 
+import Navbar from '../pages/navbar/Navbar';
 import LandingPage from '../pages/LandingPage';
 import NewsfeedPage from '../pages/NewsfeedPage';
 import FriendsPage from '../pages/FriendsPage';
@@ -11,6 +12,7 @@ import NotFoundPage from '../pages/404-page/NotFoundPage';
 const App = () => {
   return (
     <BrowserRouter>
+      <Navbar />
       <Switch>
         <Route exact path='/' component={LandingPage} />
         <Route exact path='/newsfeed' component={NewsfeedPage} />

@@ -24,12 +24,12 @@ const Relation = db.define(
       primaryKey: true,
       allowNull: false
     },
-    relation: {
+    relationType: {
       type: Sequelize.STRING,
-      defaultValue: 'none',
+      allowNull: false,
       validate: {
         isIn: [
-          ['none', 'pending_first_second', 'pending_second_first', 'friends']
+          ['pending_first_second', 'pending_second_first', 'friends']
         ]
       }
     }

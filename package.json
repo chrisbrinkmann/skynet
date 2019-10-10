@@ -13,7 +13,13 @@
     "setupFiles": [
       "./config/jest.config.js"
     ],
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "watchPathIgnorePatterns": [
+      "client"
+    ],
+    "coveragePathIgnorePatterns": [
+      "client"
+    ]
   },
   "author": "Chris Brinkmann, Min Ko, Peter Le",
   "license": "ISC",

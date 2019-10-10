@@ -1,17 +1,13 @@
 const request = require('supertest')
 const jwt = require('jsonwebtoken')
 const app = require('../src/app')
-const User = require('../src/models/User')
 const Post = require('../src/models/Post')
 const {
   syncDatabase,
-  populateTables,
-  sampleUsers,
   tokens
 } = require('./fixtures/db')
 
-beforeAll(syncDatabase)
-beforeEach(populateTables)
+beforeEach(syncDatabase)
 
 /**
  * Create new post endpoint tests

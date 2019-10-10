@@ -1,15 +1,11 @@
 const request = require('supertest')
 const app = require('../src/app')
-const User = require('../src/models/User')
 const {
   syncDatabase,
-  populateTables,
-  sampleUsers,
   tokens
 } = require('./fixtures/db')
 
-beforeAll(syncDatabase)
-beforeEach(populateTables)
+beforeEach(syncDatabase)
 
 /**
  * Tests for auth middleware
@@ -73,6 +69,27 @@ test('Should not create a new post if an invalid token is provided', async () =>
   // send req to auth protected endpoint; do not provide any token header
   const response = await request(app)
     .post('/posts/new')
+    .set('x-auth-token', 'someInvalidToken') // provide invalid token header
+    .expect(401) // assert http res code
+
+  // assert response message content
+  expect(response.body.msg).toBe('Invalid token; authorization denied')
+})
+
+test('Should not create a new comment if no auth token is provided', async () => {
+  // send req to auth protected endpoint; do not set any token header
+  const response = await request(app)
+    .post('/comments/new/1')
+    .expect(401) // assert http res code
+
+  // assert response message content
+  expect(response.body.msg).toBe('No token; authorization denied')
+})
+
+test('Should not create a new comment if an invalid token is provided', async () => {
+  // send req to auth protected endpoint; do not provide any token header
+  const response = await request(app)
+    .post('/comments/new/1')
     .set('x-auth-token', 'someInvalidToken') // provide invalid token header
     .expect(401) // assert http res code
 

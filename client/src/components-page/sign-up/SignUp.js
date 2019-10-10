@@ -32,40 +32,48 @@ const SignUp = () => {
   };
 
   return (
-    <form onSubmit={onSubmit} className={style.form}>
-      <FormInput
-        type='text'
-        name='name' 
-        placeholder='Username'
-        value={name}
-        onChange={onChange}
-      />
-      <FormInput
-        type='email'
-        name='email' 
-        placeholder='Email'
-        value={email}
-        onChange={onChange}
-        required
-      />
-      <FormInput 
-        type='password'
-        name='password'
-        placeholder='Password'
-        value={password}
-        onChange={onChange}
-        required
-      />
-      <FormInput 
-        type='password'
-        name='confirmPassword'
-        placeholder='Confirm Password'
-        value={confirmPassword}
-        onChange={onChange}
-        required
-      />
-      <Button>Sign Up</Button>
-    </form>
+    <div className={style.signup}>
+
+      <div className={style.header}>
+        <h2 className={style.title}>Sign Up</h2>
+        <h3 className={style.subtitle}>Create your account below</h3>
+      </div>
+
+      <form onSubmit={onSubmit} className={style.form}>
+        <FormInput
+          type='text'
+          name='name' 
+          placeholder='Username'
+          value={name}
+          onChange={onChange}
+        />
+        <FormInput
+          type='email'
+          name='email' 
+          placeholder='Email'
+          value={email}
+          onChange={onChange}
+          required
+        />
+        <FormInput 
+          type='password'
+          name='password'
+          placeholder='Password'
+          value={password}
+          onChange={onChange}
+          required
+        />
+        <FormInput 
+          type='password'
+          name='confirmPassword'
+          placeholder='Confirm Password'
+          value={confirmPassword}
+          onChange={onChange}
+          required
+        />
+        <Button>Sign Up</Button>
+      </form>
+    </div>
   )
 };
 

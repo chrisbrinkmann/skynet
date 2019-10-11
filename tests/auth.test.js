@@ -2,6 +2,7 @@ const request = require('supertest')
 const app = require('../src/app')
 const {
   syncDatabase,
+  dbUsers,
   tokens
 } = require('./fixtures/db')
 
@@ -28,10 +29,10 @@ test('Should get all users when auth is valid (user is logged in)', async () => 
     .set('x-auth-token', tokens[2]) // set sampleUser[2] token header
     .expect(200) // assert http res code
 
-  // assert res has array with the 3 sample users
-  expect(response1.body.length).toBe(3)
-  expect(response2.body.length).toBe(3)
-  expect(response3.body.length).toBe(3)
+  // assert res has array with the correct amount of users
+  expect(response1.body.length).toBe(dbUsers.length)
+  expect(response2.body.length).toBe(dbUsers.length)
+  expect(response3.body.length).toBe(dbUsers.length)
 })
 
 test('Should not get any users if no auth token is provided', async () => {
@@ -95,4 +96,14 @@ test('Should not create a new comment if an invalid token is provided', async ()
 
   // assert response message content
   expect(response.body.msg).toBe('Invalid token; authorization denied')
+})
+
+test('Should not create a new relation if no auth token is provided', async () => {
+  // send req to auth protected endpoint; do not set any token header
+  const response = await request(app)
+    .post('/relations/request/1')
+    .expect(401) // assert http res code
+
+  // assert response message content
+  expect(response.body.msg).toBe('No token; authorization denied')
 })

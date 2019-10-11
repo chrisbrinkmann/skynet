@@ -8,11 +8,14 @@ import FriendsPage from '../pages/FriendsPage';
 import ProfilePage from '../pages/ProfilePage';
 import NotFoundPage from '../pages/404-page/NotFoundPage';
 
+import Alert from '../components-page/alert/Alert';
+
 // *************************** APP ROUTER *************************** //
 const App = () => {
   return (
     <BrowserRouter>
       <Navbar />
+      <Alert />
       <Switch>
         <Route exact path='/' component={LandingPage} />
         <Route exact path='/newsfeed' component={NewsfeedPage} />

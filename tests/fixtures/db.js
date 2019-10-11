@@ -2,10 +2,11 @@ const db = require('../../src/database/database')
 const User = require('../../src/models/User')
 const Post = require('../../src/models/Post')
 const Comment = require('../../src/models/Comment')
+const Relation = require('../../src/models/Relation')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 
-// sample register user http req data
+// sample register user http req body data
 const sampleUserData = [
   {
     name: 'Chris',
@@ -21,16 +22,15 @@ const sampleUserData = [
     name: 'Peter',
     email: 'peter@example.com',
     password: '123456'
+  },
+  {
+    name: 'John',
+    email: 'john@example.com',
+    password: '123456'
   }
 ]
 
-// cache users returned from db insertions here
-const dbUsers = []
-
-// cache tokens from sample user logins here
-const tokens = []
-
-// sample create new post http req data
+// sample create new post http req body data
 const samplePostData = [
   { content: 'First post!' },
   { content: 'I like pancakes.' },
@@ -39,40 +39,82 @@ const samplePostData = [
   { content: 'Your mom goes to college.' }
 ]
 
-// cache posts returned from db insertions here
+// caches for returns from db insertions and logins
+const dbUsers = []
+const tokens = []
 const dbPosts = []
-
+const dbRelations = []
 
 const syncDatabase = async () => {
-   // for each model: drop table if exists, then create new table
+  // for each model: drop table if exists, then create new table
   await db.sync({ force: true })
 
-  // clear cache of tokens
+  // clear caches
+  dbUsers.length = 0
   tokens.length = 0
+  dbPosts.length = 0
+  dbRelations.length = 0
 
-  await Promise.all(
-    // loop thru sampleUserData
-    sampleUserData.map(async user => {
-      // cache the hashed passwords
-      const hashedPassword = await bcrypt.hash(user.password, 8)
-
-      // insert sample user to DB with the hashed passwords
-      const inserted = await User.create({
-        name: user.name,
-        email: user.email,
-        password: hashedPassword
-      })
-
-      // add instered users to cache array
-      dbUsers.push(inserted.dataValues)
-
-      // login sample user
-      const token = jwt.sign(inserted.dataValues, process.env.JWT_SECRET)
-
-      // add login token to cache array
-      tokens.push(token)
-    })
+  // cache sample user hashed passwords
+  const dbUserOneHashedPassword = await bcrypt.hash(
+    sampleUserData[0].password,
+    8
   )
+  const dbUserTwoHashedPassword = await bcrypt.hash(
+    sampleUserData[1].password,
+    8
+  )
+  const dbUserThreeHashedPassword = await bcrypt.hash(
+    sampleUserData[2].password,
+    8
+  )
+  const dbUserFourHashedPassword = await bcrypt.hash(
+    sampleUserData[3].password,
+    8
+  )
+
+  // insert sample users into db with hashed passwords
+  const dbUserOne = await User.create({
+    name: sampleUserData[0].name,
+    email: sampleUserData[0].email,
+    password: dbUserOneHashedPassword
+  })
+  const dbUserTwo = await User.create({
+    name: sampleUserData[1].name,
+    email: sampleUserData[1].email,
+    password: dbUserTwoHashedPassword
+  })
+  const dbUserThree = await User.create({
+    name: sampleUserData[2].name,
+    email: sampleUserData[2].email,
+    password: dbUserThreeHashedPassword
+  })
+  const dbUserFour = await User.create({
+    name: sampleUserData[3].name,
+    email: sampleUserData[3].email,
+    password: dbUserFourHashedPassword
+  })
+
+  // login sample users (create auth tokens)
+  const dbUserOneToken = jwt.sign(dbUserOne.dataValues, process.env.JWT_SECRET)
+  const dbUserTwoToken = jwt.sign(dbUserTwo.dataValues, process.env.JWT_SECRET)
+  const dbUserThreeToken = jwt.sign(
+    dbUserThree.dataValues,
+    process.env.JWT_SECRET
+  )
+  const dbUserFourToken = jwt.sign(
+    dbUserFour.dataValues,
+    process.env.JWT_SECRET
+  )
+
+  // add inserted users and tokens to cache
+  dbUsers.push(
+    dbUserOne.dataValues,
+    dbUserTwo.dataValues,
+    dbUserThree.dataValues,
+    dbUserFour.dataValues
+  )
+  tokens.push(dbUserOneToken, dbUserTwoToken, dbUserThreeToken, dbUserFourToken)
 
   // insert sample posts into db
   const dbPostOne = await Post.create({
@@ -96,7 +138,7 @@ const syncDatabase = async () => {
     content: samplePostData[4].content
   })
 
-  // add inserted tasks to cache array
+  // add inserted posts to cache array
   dbPosts.push(
     dbPostOne.dataValues,
     dbPostTwo.dataValues,
@@ -104,6 +146,21 @@ const syncDatabase = async () => {
     dbPostFour.dataValues,
     dbPostFive.dataValues
   )
+
+  // insert sample relations into db
+  const dbRelationOne = await Relation.create({
+    first_user_id: dbUsers[1].id,
+    second_user_id: dbUsers[2].id,
+    relationType: 'pending_first_second'
+  })
+  const dbRelationTwo = await Relation.create({
+    first_user_id: dbUsers[0].id,
+    second_user_id: dbUsers[2].id,
+    relationType: 'pending_second_first'
+  })
+
+  // add inserted relations to cache array
+  dbRelations.push(dbRelationOne.dataValues, dbRelationTwo.dataValues)
 }
 
 module.exports = {

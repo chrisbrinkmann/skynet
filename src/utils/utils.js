@@ -64,11 +64,30 @@ const setAvatar = email => {
   })
 }
 
+// returns a properly formatted object for insertion to relations table
+const formatRelation = (first_user_id, second_user_id, relationType) => {
+  // cache variables; assume requester has the lower id
+  let relationData = {
+    first_user_id,
+    second_user_id,
+    relationType
+  }
+  // if requester has the higher id; swap user positions and relation type
+  if (first_user_id > second_user_id) {
+    relationData.first_user_id = second_user_id
+    relationData.second_user_id = first_user_id
+    relationData.relationType = 'pending_second_first'
+  }
+
+  return relationData
+}
+
 module.exports = {
   createAuthToken,
   createUser,
   registerValidatorChecks,
   loginValidatorChecks,
   contentValidatorChecks,
-  setAvatar
+  setAvatar,
+  formatRelation
 }

@@ -4,7 +4,7 @@ const Comment = require('../models/Comment')
 const Post = require('../models/Post')
 const { validationResult } = require('express-validator')
 const auth = require('../middleware/auth')
-const { contentValidatorChecks } = require('../utils/utils')
+const { contentValidatorChecks, areFriends } = require('../utils/utils')
 
 // create new comment
 router.post(
@@ -22,6 +22,13 @@ router.post(
 
       if (!post) {
         return res.status(404).json({ msg: 'Post not found' })
+      }
+
+      // confirm commenter and poster are friends
+      const friends = await areFriends(req.user.id, post.dataValues.user_id)
+
+      if (!friends) {
+        return res.status(401).json({ msg: 'Must be friends to comment on post' })
       }
 
       // insert the comment into the db

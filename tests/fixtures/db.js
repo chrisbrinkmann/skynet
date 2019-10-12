@@ -149,8 +149,8 @@ const syncDatabase = async () => {
 
   // insert sample relations into db
   const dbRelationOne = await Relation.create({
-    first_user_id: dbUsers[1].id,
-    second_user_id: dbUsers[2].id,
+    first_user_id: dbUsers[0].id,
+    second_user_id: dbUsers[1].id,
     relationType: 'pending_first_second'
   })
   const dbRelationTwo = await Relation.create({
@@ -158,16 +158,26 @@ const syncDatabase = async () => {
     second_user_id: dbUsers[2].id,
     relationType: 'pending_second_first'
   })
+  const dbRelationThree = await Relation.create({
+    first_user_id: dbUsers[0].id,
+    second_user_id: dbUsers[3].id,
+    relationType: 'friends'
+  })
 
   // add inserted relations to cache array
-  dbRelations.push(dbRelationOne.dataValues, dbRelationTwo.dataValues)
+  dbRelations.push(
+    dbRelationOne.dataValues,
+    dbRelationTwo.dataValues,
+    dbRelationThree
+  )
 }
 
 module.exports = {
   syncDatabase,
   sampleUserData,
-  dbUsers,
   samplePostData,
+  dbUsers,
   dbPosts,
+  dbRelations,
   tokens
 }

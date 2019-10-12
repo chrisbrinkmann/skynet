@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken')
 const gravatar = require('gravatar')
 const User = require('../models/User')
+const Relation = require('../models/Relation')
 const { check } = require('express-validator')
 
 // returns a JsonWebToken as a string
@@ -82,6 +83,29 @@ const formatRelation = (first_user_id, second_user_id, relationType) => {
   return relationData
 }
 
+// return true iff two user ids have a friends relation
+const areFriends = async (first_user_id, second_user_id) => {
+let relationData = {
+    first_user_id,
+    second_user_id,
+    relationType: 'friends'
+  }
+
+  if (first_user_id > second_user_id) {
+    relationData.first_user_id = second_user_id
+    relationData.second_user_id = first_user_id
+  }
+
+  const friends = await Relation.findOne({
+    where: relationData
+  })
+
+  if (!friends) return false
+  
+  return true
+}
+
+
 module.exports = {
   createAuthToken,
   createUser,
@@ -89,5 +113,6 @@ module.exports = {
   loginValidatorChecks,
   contentValidatorChecks,
   setAvatar,
-  formatRelation
+  formatRelation,
+  areFriends
 }

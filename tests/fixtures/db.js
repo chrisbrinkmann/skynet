@@ -27,6 +27,11 @@ const sampleUserData = [
     name: 'John',
     email: 'john@example.com',
     password: '123456'
+  },
+  {
+    name: 'Sarah',
+    email: 'sarah@example.com',
+    password: '123456'
   }
 ]
 
@@ -36,13 +41,24 @@ const samplePostData = [
   { content: 'I like pancakes.' },
   { content: 'What is life?' },
   { content: 'I like apples.' },
-  { content: 'Your mom goes to college.' }
+  { content: 'Your mom goes to college.' },
+  { content: 'Whats up everybody?' }
+]
+
+// sample create new comment http req body data
+const sampleCommentData = [
+  { content: 'Nice!' },
+  { content: 'Way to go!' },
+  { content: 'Waffles are better.' },
+  { content: 'No french toast is best.' },
+  { content: "I'm in ketosis." }
 ]
 
 // caches for returns from db insertions and logins
 const dbUsers = []
 const tokens = []
 const dbPosts = []
+const dbComments = []
 const dbRelations = []
 
 const syncDatabase = async () => {
@@ -53,6 +69,7 @@ const syncDatabase = async () => {
   dbUsers.length = 0
   tokens.length = 0
   dbPosts.length = 0
+  dbComments.length = 0
   dbRelations.length = 0
 
   // cache sample user hashed passwords
@@ -70,6 +87,10 @@ const syncDatabase = async () => {
   )
   const dbUserFourHashedPassword = await bcrypt.hash(
     sampleUserData[3].password,
+    8
+  )
+  const dbUserFiveHashedPassword = await bcrypt.hash(
+    sampleUserData[4].password,
     8
   )
 
@@ -94,6 +115,11 @@ const syncDatabase = async () => {
     email: sampleUserData[3].email,
     password: dbUserFourHashedPassword
   })
+  const dbUserFive = await User.create({
+    name: sampleUserData[4].name,
+    email: sampleUserData[4].email,
+    password: dbUserFiveHashedPassword
+  })
 
   // login sample users (create auth tokens)
   const dbUserOneToken = jwt.sign(dbUserOne.dataValues, process.env.JWT_SECRET)
@@ -106,15 +132,26 @@ const syncDatabase = async () => {
     dbUserFour.dataValues,
     process.env.JWT_SECRET
   )
+  const dbUserFiveToken = jwt.sign(
+    dbUserFive.dataValues,
+    process.env.JWT_SECRET
+  )
 
   // add inserted users and tokens to cache
   dbUsers.push(
     dbUserOne.dataValues,
     dbUserTwo.dataValues,
     dbUserThree.dataValues,
-    dbUserFour.dataValues
+    dbUserFour.dataValues,
+    dbUserFive.dataValues
   )
-  tokens.push(dbUserOneToken, dbUserTwoToken, dbUserThreeToken, dbUserFourToken)
+  tokens.push(
+    dbUserOneToken,
+    dbUserTwoToken,
+    dbUserThreeToken,
+    dbUserFourToken,
+    dbUserFiveToken
+  )
 
   // insert sample posts into db
   const dbPostOne = await Post.create({
@@ -130,12 +167,16 @@ const syncDatabase = async () => {
     content: samplePostData[2].content
   })
   const dbPostFour = await Post.create({
-    user_id: dbUsers[1].id,
+    user_id: dbUsers[3].id,
     content: samplePostData[3].content
   })
   const dbPostFive = await Post.create({
-    user_id: dbUsers[2].id,
+    user_id: dbUsers[4].id,
     content: samplePostData[4].content
+  })
+  const dbPostSix = await Post.create({
+    user_id: dbUsers[4].id,
+    content: samplePostData[5].content
   })
 
   // add inserted posts to cache array
@@ -144,7 +185,8 @@ const syncDatabase = async () => {
     dbPostTwo.dataValues,
     dbPostThree.dataValues,
     dbPostFour.dataValues,
-    dbPostFive.dataValues
+    dbPostFive.dataValues,
+    dbPostSix.dataValues
   )
 
   // insert sample relations into db
@@ -163,12 +205,82 @@ const syncDatabase = async () => {
     second_user_id: dbUsers[3].id,
     relationType: 'friends'
   })
+  const dbRelationFour = await Relation.create({
+    first_user_id: dbUsers[0].id,
+    second_user_id: dbUsers[4].id,
+    relationType: 'friends'
+  })
+  const dbRelationFive = await Relation.create({
+    first_user_id: dbUsers[1].id,
+    second_user_id: dbUsers[3].id,
+    relationType: 'friends'
+  })
+  const dbRelationSix = await Relation.create({
+    first_user_id: dbUsers[1].id,
+    second_user_id: dbUsers[4].id,
+    relationType: 'friends'
+  })
+  const dbRelationSeven = await Relation.create({
+    first_user_id: dbUsers[2].id,
+    second_user_id: dbUsers[3].id,
+    relationType: 'friends'
+  })
+  const dbRelationEight = await Relation.create({
+    first_user_id: dbUsers[2].id,
+    second_user_id: dbUsers[4].id,
+    relationType: 'friends'
+  })
+  const dbRelationNine = await Relation.create({
+    first_user_id: dbUsers[3].id,
+    second_user_id: dbUsers[4].id,
+    relationType: 'friends'
+  })
 
   // add inserted relations to cache array
   dbRelations.push(
     dbRelationOne.dataValues,
     dbRelationTwo.dataValues,
-    dbRelationThree
+    dbRelationThree.dataValues,
+    dbRelationFour.dataValues,
+    dbRelationFive.dataValues,
+    dbRelationSix.dataValues,
+    dbRelationSeven.dataValues,
+    dbRelationEight.dataValues
+  )
+
+  // insert sample comments into db
+  const dbCommentOne = await Comment.create({
+    user_id: dbUsers[3].id,
+    post_id: dbPosts[0].id,
+    content: sampleCommentData[0].content
+  })
+  const dbCommentTwo = await Comment.create({
+    user_id: dbUsers[4].id,
+    post_id: dbPosts[0].id,
+    content: sampleCommentData[1].content
+  })
+  const dbCommentThree = await Comment.create({
+    user_id: dbUsers[3].id,
+    post_id: dbPosts[1].id,
+    content: sampleCommentData[2].content
+  })
+  const dbCommentFour = await Comment.create({
+    user_id: dbUsers[4].id,
+    post_id: dbPosts[1].id,
+    content: sampleCommentData[3].content
+  })
+  const dbCommentFive = await Comment.create({
+    user_id: dbUsers[3].id,
+    post_id: dbPosts[2].id,
+    content: sampleCommentData[4].content
+  })
+
+  dbComments.push(
+    dbCommentOne.dataValues,
+    dbCommentTwo.dataValues,
+    dbCommentThree.dataValues,
+    dbCommentFour.dataValues,
+    dbCommentFive.dataValues
   )
 }
 
@@ -176,8 +288,10 @@ module.exports = {
   syncDatabase,
   sampleUserData,
   samplePostData,
+  sampleCommentData,
   dbUsers,
   dbPosts,
   dbRelations,
+  dbComments,
   tokens
 }

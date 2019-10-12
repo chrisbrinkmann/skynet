@@ -28,7 +28,9 @@ router.post(
       const friends = await areFriends(req.user.id, post.dataValues.user_id)
 
       if (!friends) {
-        return res.status(401).json({ msg: 'Must be friends to comment on post' })
+        return res
+          .status(401)
+          .json({ msg: 'Must be friends to comment on post' })
       }
 
       // insert the comment into the db
@@ -40,9 +42,9 @@ router.post(
 
       res.status(201).json(comment)
     } catch (err) {
-      if (err.kind === 'ObjectId') {
-        // this message will trigger iff err is from an invalid post id
-        return res.status(404).json({ msg: 'Post not found' })
+      if (err.message.match(/^(invalid input syntax for integer)/)) {
+        // this message will trigger iff non integer is put in req param
+        return res.status(400).json({ msg: 'Post not found' })
       }
       res.status(500).send('Server Error')
     }
@@ -57,6 +59,36 @@ router.get('/', async (req, res) => {
     res.status(200).send(comments)
   } catch (err) {
     res.status(400).send(err)
+  }
+})
+
+// delete a comment
+router.delete('/:comment_id', auth, async (req, res) => {
+  try {
+    // confirm comment to delete exists in db
+    const comment = await Comment.findOne({
+      where: { id: req.params.comment_id }
+    })
+
+    if (!comment) {
+      return res.status(404).json({ msg: 'Comment not found' })
+    }
+
+    // confirm comment to delete is owned by user who is deleting
+    if (comment.dataValues.user_id !== req.user.id) {
+      return res.status(401).json({ msg: 'Cannot delete other users comments' })
+    }
+
+    // delete the comment from the db
+    await comment.destroy({ force: true })
+
+    res.status(200).json({ msg: 'Comment deleted' })
+  } catch (err) {
+    if (err.message.match(/^(invalid input syntax for integer)/)) {
+      // this message will trigger iff non integer is put in req param
+      return res.status(400).json({ msg: 'Comment not found' })
+    }
+    res.status(500).send('Server Error')
   }
 })
 

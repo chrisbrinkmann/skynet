@@ -13,6 +13,13 @@ beforeEach(syncDatabase)
  */
 
 test('Should create a new comment when content is provided, post id is valid, and the two users are friends', async () => {
+  // cache the req user object from the auth token payload
+  const decoded = jwt.verify(tokens[1], process.env.JWT_SECRET)
+
+  // assert the commenter and post owner are friends
+  expect(await areFriends(decoded.id, dbPosts[3].user_id)).toBeTruthy()
+
+  // dbUsers[1] comments on dbPosts[3]
   const response = await request(app)
     .post(`/comments/new/${dbPosts[3].id}`)
     .set('x-auth-token', tokens[1])
@@ -21,23 +28,65 @@ test('Should create a new comment when content is provided, post id is valid, an
     })
     .expect(201) // assert http res code
 
-  const comment = await Comment.findOne({ where: { content: 'Wow good job!' } })
-  const decoded = jwt.verify(tokens[1], process.env.JWT_SECRET)
+  // query the db for the inserted comment
+  const comment = await Comment.findOne({
+    where: {
+      user_id: decoded.id,
+      post_id: dbPosts[3].id,
+      content: 'Wow good job!'
+    }
+  })
 
-  // assert comment exists in db with name and id that matches req content and token
-  expect(comment.user_id).toEqual(decoded.id)
-
-  // assert comment has post id matching req param
-  expect(comment.post_id).toEqual(dbPosts[3].id)
-
-  // assert the commenter and post owner are friends
-  expect(await areFriends(decoded.id, dbPosts[3].user_id)).toBeTruthy()
+  // assert newly created comment exists in the db
+  expect(comment).not.toBeNull()
 
   // assert response body content to match the post content
   expect(response.body.content).toEqual('Wow good job!')
 })
 
-test('Should not create a new comment the two users are not friends', async () => {
+test('Should create a new comment when content is provided, post id is valid, and the commenter owns the post', async () => {
+  // cache the req user object from the auth token payload
+  const decoded = jwt.verify(tokens[0], process.env.JWT_SECRET)
+
+  // assert the req user owns the post to comment on
+  expect(decoded.id === dbPosts[0].user_id).toBeTruthy()
+
+  // dbUsers[0] comments on dbPosts[0]
+  const response = await request(app)
+    .post(`/comments/new/${dbPosts[0].id}`)
+    .set('x-auth-token', tokens[0])
+    .send({
+      content: 'Wow good job!'
+    })
+    .expect(201) // assert http res code
+
+  // query the db for the inserted comment
+  const comment = await Comment.findOne({
+    where: {
+      user_id: decoded.id,
+      post_id: dbPosts[0].id,
+      content: 'Wow good job!'
+    }
+  })
+
+  // assert the newly created comment exists in db
+  expect(comment).not.toBeNull()
+
+  // assert response body content to match the post content
+  expect(response.body.content).toEqual('Wow good job!')
+})
+
+test('Should not create a new comment when commenter is not either post owner or friend of owner', async () => {
+  // cache the req user object from the auth token payload
+  const decoded = jwt.verify(tokens[1], process.env.JWT_SECRET)
+
+  // assert the commenter and post owner are not friends
+  expect(await areFriends(decoded.id, dbPosts[0].user_id)).toBeFalsy()
+
+  // assert the req user does not own the post to comment on
+  expect(decoded.id === dbPosts[0].user_id).toBeFalsy()
+
+  // dbUsers[1] comments on dbPosts[0]
   const response = await request(app)
     .post(`/comments/new/${dbPosts[0].id}`)
     .set('x-auth-token', tokens[1])
@@ -46,19 +95,22 @@ test('Should not create a new comment the two users are not friends', async () =
     })
     .expect(401) // assert http res code
 
-  // cache the req user object from the auth token payload
-  const decoded = jwt.verify(tokens[1], process.env.JWT_SECRET)
+  // query db for attempted inserted comment
+  const comment = await Comment.findOne({
+    where: {
+      user_id: decoded.id,
+      post_id: dbPosts[0].id,
+      content: 'Wow good job!'
+    }
+  })
 
-  const comment = await Comment.findOne({ where: { content: 'Wow good job!' } })
-
-  // assert no comment with req body content was added to the db
+  // assert attempted comment was not inserted to db
   expect(comment).toBeNull()
 
-  // assert the commenter and post owner are not friends
-  expect(await areFriends(decoded.id, dbPosts[0].user_id)).toBeFalsy()
-
   // assert response body content to match the post content
-  expect(response.body.msg).toEqual('Must be friends to comment on post')
+  expect(response.body.msg).toEqual(
+    'Only post owner and friends of owner can comment'
+  )
 })
 
 test('Should not create a new comment when content is empty', async () => {
@@ -98,7 +150,7 @@ test('Should not create a new comment for non existant post id', async () => {
 test('Should delete a comment when id is valid and deleter owns the comment', async () => {
   // cache the req user object from the auth token payload
   const decoded = jwt.verify(tokens[3], process.env.JWT_SECRET)
-  
+
   // assert req user created the comment to delete
   expect(decoded.id === dbComments[4].user_id)
 
@@ -123,7 +175,7 @@ test('Should delete a comment when id is valid and deleter owns the comment', as
 test('Should delete a comment when id is valid and deleter owns the parent post, but does not own the comment', async () => {
   // cache the req user object from the auth token payload
   const decoded = jwt.verify(tokens[0], process.env.JWT_SECRET)
-  
+
   // query db for parent post of comment
   const post = await Post.findOne({
     where: { id: dbComments[0].post_id }
@@ -156,7 +208,7 @@ test('Should delete a comment when id is valid and deleter owns the parent post,
 test('Should not delete a comment when id is valid, but the deleter does not own the comment or parent post', async () => {
   // cache the req user object from the auth token payload
   const decoded = jwt.verify(tokens[1], process.env.JWT_SECRET)
-  
+
   // assert req user did not create the comment to delete
   expect(decoded.id !== dbComments[4].user_id)
 
@@ -183,7 +235,9 @@ test('Should not delete a comment when id is valid, but the deleter does not own
   expect(comment).not.toBeNull()
 
   // assert http response msg to match expected
-  expect(response.body.msg).toEqual('Only post or comment owner can delete comments')
+  expect(response.body.msg).toEqual(
+    'Only post or comment owner can delete comments'
+  )
 })
 
 test('Should send applicable http response when deleting non existant comment', async () => {

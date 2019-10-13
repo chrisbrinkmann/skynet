@@ -230,11 +230,6 @@ const syncDatabase = async () => {
     second_user_id: dbUsers[4].id,
     relationType: 'friends'
   })
-  const dbRelationNine = await Relation.create({
-    first_user_id: dbUsers[3].id,
-    second_user_id: dbUsers[4].id,
-    relationType: 'friends'
-  })
 
   // add inserted relations to cache array
   dbRelations.push(

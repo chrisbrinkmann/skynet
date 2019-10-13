@@ -43,7 +43,7 @@ router.post(
       res.status(201).json(comment)
     } catch (err) {
       if (err.message.match(/^(invalid input syntax for integer)/)) {
-        // this message will trigger iff non integer is put in req param
+        // this message will trigger if non integer is put in req param
         return res.status(400).json({ msg: 'Post not found' })
       }
       res.status(500).send('Server Error')
@@ -74,9 +74,17 @@ router.delete('/:comment_id', auth, async (req, res) => {
       return res.status(404).json({ msg: 'Comment not found' })
     }
 
-    // confirm comment to delete is owned by user who is deleting
-    if (comment.dataValues.user_id !== req.user.id) {
-      return res.status(401).json({ msg: 'Cannot delete other users comments' })
+    // cache the post that the comment belongs to
+    const post = await Post.findOne({
+      where: { id: comment.dataValues.post_id }
+    })
+
+    // confirm either comment or the post is owned by the deleter
+    if (
+      comment.dataValues.user_id !== req.user.id &&
+      post.dataValues.user_id !== req.user.id
+    ) {
+      return res.status(401).json({ msg: 'Only post or comment owner can delete comments' })
     }
 
     // delete the comment from the db
@@ -85,7 +93,7 @@ router.delete('/:comment_id', auth, async (req, res) => {
     res.status(200).json({ msg: 'Comment deleted' })
   } catch (err) {
     if (err.message.match(/^(invalid input syntax for integer)/)) {
-      // this message will trigger iff non integer is put in req param
+      // this message will trigger if non integer is put in req param
       return res.status(400).json({ msg: 'Comment not found' })
     }
     res.status(500).send('Server Error')

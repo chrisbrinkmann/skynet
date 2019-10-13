@@ -27,10 +27,11 @@ router.post(
       // confirm commenter and poster are friends
       const friends = await areFriends(req.user.id, post.dataValues.user_id)
 
-      if (!friends) {
+      // only allow friends or post owner to comment
+      if (!friends && req.user.id !== post.dataValues.user_id) {
         return res
           .status(401)
-          .json({ msg: 'Must be friends to comment on post' })
+          .json({ msg: 'Only post owner and friends of owner can comment' })
       }
 
       // insert the comment into the db
@@ -84,7 +85,9 @@ router.delete('/:comment_id', auth, async (req, res) => {
       comment.dataValues.user_id !== req.user.id &&
       post.dataValues.user_id !== req.user.id
     ) {
-      return res.status(401).json({ msg: 'Only post or comment owner can delete comments' })
+      return res
+        .status(401)
+        .json({ msg: 'Only post or comment owner can delete comments' })
     }
 
     // delete the comment from the db

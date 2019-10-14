@@ -1,7 +1,13 @@
 const request = require('supertest')
+const Sequelize = require('sequelize')
+const Op = Sequelize.Op
+const jwt = require('jsonwebtoken')
 const app = require('../src/app')
 const User = require('../src/models/User')
-const { syncDatabase, sampleUserData } = require('./fixtures/db')
+const Relation = require('../src/models/Relation')
+const Post = require('../src/models/Post')
+const Comment = require('../src/models/Comment')
+const { syncDatabase, sampleUserData, tokens } = require('./fixtures/db')
 
 beforeEach(syncDatabase)
 
@@ -131,4 +137,111 @@ test('Should not login a non existant user', async () => {
 
   // assert response object does not contain token
   expect(response.body.hasOwnProperty('token')).toBeFalsy()
+})
+
+/**
+ * Delete user account endpoint tests
+ */
+
+test('Should delete user when auth token is valid', async () => {
+  // dbusers[0] deletes their account
+  const response = await request(app)
+    .delete('/users/me')
+    .set('x-auth-token', tokens[0])
+    .expect(200)
+
+  // assert response body msg matches expected
+  expect(response.body.msg).toEqual('Hasta la vista, baby')
+})
+
+test('Should delete all users relations when user is deleted', async () => {
+  // cache the req user object from the auth token payload
+  const decoded = jwt.verify(tokens[1], process.env.JWT_SECRET)
+
+  // query db for relations of dbUsers[1]
+  let relations = await Relation.findAll({
+    where: {
+      [Op.or]: [
+        { first_user_id: { [Op.eq]: decoded.id } },
+        { second_user_id: { [Op.eq]: decoded.id } }
+      ]
+    }
+  })
+
+  // assert existence of 3 relations for dbUsers[1]
+  expect(relations.length).toBe(3)
+
+  // dbusers[1] deletes their account
+  const response = await request(app)
+    .delete('/users/me')
+    .set('x-auth-token', tokens[1])
+    .expect(200)
+
+  //query db for relations of dbUsers[1]
+  relations = await Relation.findAll({
+    where: {
+      [Op.or]: [
+        { first_user_id: { [Op.eq]: decoded.id } },
+        { second_user_id: { [Op.eq]: decoded.id } }
+      ]
+    }
+  })
+
+  // assert relations of deleted user no longer exist
+  expect(relations).toEqual([])
+
+  // assert response body msg matches expected
+  expect(response.body.msg).toEqual('Hasta la vista, baby')
+})
+
+test('Should delete all users posts when user is deleted', async () => {
+  // cache the req user object from the auth token payload
+  const decoded = jwt.verify(tokens[4], process.env.JWT_SECRET)
+
+  // query db for posts of dbUsers[4]
+  let posts = await Post.findAll({ where: { user_id: decoded.id } })
+
+  // assert existence of 2 posts for dbUsers[4]
+  expect(posts.length).toBe(2)
+
+  // dbusers[4] deletes their account
+  const response = await request(app)
+    .delete('/users/me')
+    .set('x-auth-token', tokens[4])
+    .expect(200)
+
+  // query db for posts of dbUsers[4]
+  posts = await Post.findAll({ where: { user_id: decoded.id } })
+
+  // assert posts of deleted user no longer exist
+  expect(posts).toEqual([])
+
+  // assert response body msg matches expected
+  expect(response.body.msg).toEqual('Hasta la vista, baby')
+})
+
+test('Should delete all users comments when user is deleted', async () => {
+  // cache the req user object from the auth token payload
+  const decoded = jwt.verify(tokens[4], process.env.JWT_SECRET)
+
+  // query db for comments of dbUsers[4]
+  let comments = await Comment.findAll({ where: { user_id: decoded.id } })
+
+  // assert existence of 2 comments for dbUsers[4]
+  expect(comments.length).toBe(2)
+
+  // dbusers[4] deletes their account
+  const response = await request(app)
+    .delete('/users/me')
+    .set('x-auth-token', tokens[4])
+    .expect(200)
+
+  // query db for comments of dbUsers[4]
+  comments = await Comment.findAll({ where: { user_id: decoded.id } })
+
+  // assert comments of deleted user no longer exist
+  expect(comments).toEqual([])
+
+  // assert response body msg matches expected
+  expect(response.body.msg).toEqual('Hasta la vista, baby')
 })

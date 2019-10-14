@@ -85,9 +85,24 @@ router.post('/login', loginValidatorChecks(), async (req, res) => {
 // get all users
 router.get('/', auth, async (req, res) => {
   try {
-    let users = await User.findAll({ attributes: { exclude: ['password']}})
+    let users = await User.findAll({ attributes: { exclude: ['password'] } })
 
     res.status(200).json(users)
+  } catch (err) {
+    res.status(500).send('Server Error')
+  }
+})
+
+// delete account
+router.delete('/me', auth, async (req, res) => {
+  try {
+    // query db for req user
+    const user = await User.findOne({ where: { id: req.user.id } })
+
+    // delete user from db
+    await user.destroy()
+
+    res.status(200).json({ msg: 'Hasta la vista, baby' })
   } catch (err) {
     res.status(500).send('Server Error')
   }

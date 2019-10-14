@@ -88,7 +88,7 @@ test('Should not create a new comment if no auth token is provided', async () =>
 })
 
 test('Should not create a new comment if an invalid token is provided', async () => {
-  // send req to auth protected endpoint; do not provide any token header
+  // send req to auth protected endpoint
   const response = await request(app)
     .post('/comments/new/1')
     .set('x-auth-token', 'someInvalidToken') // provide invalid token header
@@ -107,3 +107,23 @@ test('Should not create a new relation if no auth token is provided', async () =
   // assert response message content
   expect(response.body.msg).toBe('No token; authorization denied')
 })
+
+test('Should not delete user when invalid is provided', async () => {
+  // dbusers[0] deletes their account; set invalid token header
+  const response = await request(app)
+    .delete('/users/me')
+    .set('x-auth-token', 'someInvalidToken')
+    .expect(401)
+  
+  expect(response.body.msg).toEqual('Invalid token; authorization denied')
+ })
+
+
+test('Should not delete user when no auth token is provideed', async () => {
+  // dbusers[0] deletes their account; do not set token header
+  const response = await request(app)
+    .delete('/users/me')
+    .expect(401)
+  
+  expect(response.body.msg).toEqual('No token; authorization denied')
+ })

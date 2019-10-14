@@ -2,6 +2,8 @@ const jwt = require('jsonwebtoken')
 const gravatar = require('gravatar')
 const User = require('../models/User')
 const Relation = require('../models/Relation')
+const Sequelize = require('sequelize')
+const Op = Sequelize.Op
 const { check } = require('express-validator')
 
 // returns a JsonWebToken as a string
@@ -116,6 +118,57 @@ const getRelation = async (first_user_id, second_user_id) => {
   return relation
 }
 
+// return array of friends db relations
+const getFriendRelations = async user_id => {
+  // query db
+  let friends = await Relation.findAll({
+    where: {
+      [Op.or]: [
+        { first_user_id: { [Op.eq]: user_id } },
+        { second_user_id: { [Op.eq]: user_id } }
+      ],
+      relationType: 'friends'
+    }
+  })
+
+  // trim extraneous data from db query result
+  friends = friends.map(friend => {
+    return friend.dataValues
+  })
+
+  return friends
+}
+
+// returns a formatted friends list array with friend id, name, avatar
+const populateFriendsList = async (friendRelations, user_id) => {
+  // create cache of friend objects
+  let friendsList = []
+
+  // add object with friend id to friendsList for each friend
+  friendRelations.map(friend => {
+    if (friend.first_user_id !== user_id) {
+      return friendsList.push({ id: friend.first_user_id })
+    }
+    if (friend.second_user_id !== user_id) {
+      return friendsList.push({ id: friend.second_user_id })
+    }
+  })
+
+  // add friend user.name and user.avatar to each friendsList object
+  friendsList = await Promise.all(
+    friendsList.map(async friend => {
+      const user = await User.findOne({ where: { id: friend.id } })
+
+      friend.name = user.dataValues.name
+      friend.avatar = user.dataValues.avatar
+
+      return friend
+    })
+  )
+
+  return friendsList
+}
+
 module.exports = {
   createAuthToken,
   createUser,
@@ -125,5 +178,7 @@ module.exports = {
   setAvatar,
   formatPendingRelation,
   areFriends,
-  getRelation
+  getRelation,
+  getFriendRelations,
+  populateFriendsList
 }

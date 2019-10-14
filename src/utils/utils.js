@@ -66,45 +66,55 @@ const setAvatar = email => {
 }
 
 // returns a properly formatted object for insertion to relations table
-const formatRelation = (first_user_id, second_user_id, relationType) => {
+const formatPendingRelation = (requester, requestee, relationType) => {
   // cache variables; assume requester has the lower id
   let relationData = {
-    first_user_id,
-    second_user_id,
+    first_user_id: requester,
+    second_user_id: requestee,
     relationType
   }
   // if requester has the higher id; swap user positions and relation type
-  if (first_user_id > second_user_id) {
-    relationData.first_user_id = second_user_id
-    relationData.second_user_id = first_user_id
+  if (requester > requestee) {
+    relationData.first_user_id = requestee
+    relationData.second_user_id = requester
     relationData.relationType = 'pending_second_first'
   }
 
   return relationData
 }
 
-// return true iff two user ids have a friends relation
+// return true if two users have a friends relation
 const areFriends = async (first_user_id, second_user_id) => {
-let relationData = {
+  // query db for relation
+  const relation = await getRelation(first_user_id, second_user_id)
+
+  // return false if there is no friends relation
+  if (!relation || relation.dataValues.relationType !== 'friends') return false
+
+  return true
+}
+
+// query db for existing relation between to users; return the relation or null if none
+const getRelation = async (first_user_id, second_user_id) => {
+  // cache user id parameters
+  let relationData = {
     first_user_id,
-    second_user_id,
-    relationType: 'friends'
+    second_user_id
   }
 
+  // format relation so first_user_is is the lower of the two
   if (first_user_id > second_user_id) {
     relationData.first_user_id = second_user_id
     relationData.second_user_id = first_user_id
   }
 
-  const friends = await Relation.findOne({
+  // query db for the relation
+  const relation = await Relation.findOne({
     where: relationData
   })
 
-  if (!friends) return false
-  
-  return true
+  return relation
 }
-
 
 module.exports = {
   createAuthToken,
@@ -113,6 +123,7 @@ module.exports = {
   loginValidatorChecks,
   contentValidatorChecks,
   setAvatar,
-  formatRelation,
-  areFriends
+  formatPendingRelation,
+  areFriends,
+  getRelation
 }

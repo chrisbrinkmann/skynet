@@ -91,3 +91,8 @@ export const loginUser = (email, password) => async (dispatch) => {
     });
   };
 };
+
+// *************************** LOGOUT USER *************************** //
+export const logoutUser = () => (dispatch) => {
+  dispatch({ type: LOGOUT_USER });
+};

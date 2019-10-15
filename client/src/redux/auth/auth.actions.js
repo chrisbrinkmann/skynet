@@ -57,3 +57,37 @@ export const registerUser = ({ name, email, password }) => async (dispatch) => {
     });
   }
 };
+
+// *************************** LOGIN USER *************************** //
+export const loginUser = (email, password) => async (dispatch) => {
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  };
+
+  const body = JSON.stringify({ email, password });
+
+  const route = 'http://localhost:3000';
+
+  try {
+    const res = await axios.post(`${route}/users/login`, body, config);
+    dispatch({
+      type: LOGIN_SUCCESS,
+      payload: res.data,
+    });
+
+    dispatch(loadUser());
+  } catch (err) {
+    const errors = err.response.data.errors;
+
+    if (errors) {
+      errors.forEach(error => dispatch(
+        setAlert(error.msg, 'danger', 2000)
+      ))
+    }
+    dispatch({
+      type: LOGIN_FAIL
+    });
+  };
+};

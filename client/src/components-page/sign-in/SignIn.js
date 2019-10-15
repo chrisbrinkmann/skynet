@@ -1,4 +1,8 @@
 import React, { useState } from 'react';
+import { connect } from 'react-redux';
+
+import { setAlert } from '../../redux/alert/alert.actions';
+import { loginUser } from '../../redux/auth/auth.actions';
 
 import FormInput from '../../components-ui/form-input/FormInput';
 import Button from '../../components-ui/button/Button';
@@ -6,7 +10,7 @@ import Button from '../../components-ui/button/Button';
 import style from './sign-in.module.scss';
 
 // *************************** SIGN IN COMPONENT *************************** //
-const SignIn = () => {
+const SignIn = ({ loginUser }) => {
   const [ formData, setFormData ] = useState({
     email: '',
     password: '',
@@ -23,7 +27,7 @@ const SignIn = () => {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    console.log('Submitted');
+    loginUser(email, password);
   };
 
   return (
@@ -51,4 +55,10 @@ const SignIn = () => {
   )
 };
 
-export default SignIn;
+// REDUX
+const mapDispatchToProps = (dispatch) => ({
+  setAlert: (msg, alertType, timeout) => dispatch(setAlert(msg, alertType, timeout)),
+  loginUser: (email, password) => dispatch(loginUser(email, password)),
+});
+
+export default connect(null, mapDispatchToProps)(SignIn);

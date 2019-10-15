@@ -4,8 +4,8 @@
   "description": "Social network app",
   "main": "index.js",
   "scripts": {
-    "createdb": "createdb -O postgres -U postgres skynet",
-    "createdb-test": "createdb -O postgres -U postgres skynet-test",
+    "bootstrap": "npm i",
+    "setup": "psql -U postgres -f ./config/dbSetup.sql",
     "server": "nodemon -r dotenv/config src/server.js dotenv_config_path=./config/.env.local",
     "test": "jest --watch --i --verbose"
   },

@@ -29,21 +29,22 @@ To clone and build this application, you'll need [Git](https://git-scm.com), [No
 $ git clone https://github.com/chrisbrinkmann/skynet.git
 ```
 
-### Setting Up A Local DB:
+### Setting Up Your Local Databases:
 If Using Windows, add path to the bin folder where psql.exe was installed to Windows Path environemnt variable.
 
-#### Create a local DB named 'skynet'
+#### Create local 2 local databases named 'skynet' and 'skynet-test'
+* If your Postgres username is something other than `postgres`, you will first need to replace `postgres` with your username in the `setup` script in package.json:
+  * `psql -U <your_username> -f ./config/dbSetup.sql`
 ```bash
 # Navigate to the repository root
 $ cd skynet
 
-# Run script to create the DB
-$ npm run createdb
+# Run script to create the databases
+$ npm run setup
 
-# Enter your password when prompted
-
-# If your Postgres username is something other than 'postgres', # you will first need to replace 'postgres' with your username  # in the 'createdb' script in package.json (createdb -O         # <username> -U <username> skynet)
+# Enter your psql password when prompted
 ```
+* Running this script will drop any existing databases with these names; so be aware that you will lose any previously stored data in your databases by running this script.
 
 #### Postgres GUIs
 GUI clients can be used to connect to the database, and provide many useful tools for viewing and manipulating data. Here are a few of the many ones available.
@@ -71,7 +72,7 @@ You will need to setup your own local environment variables. To do this:
 $ cd skynet
 
 # Install dependencies for the server
-$ npm i
+$ npm run bootstrap
 
 # Start the server
 $ npm run server
@@ -83,7 +84,7 @@ Open a second terminal window
 $ cd skynet/client
 
 # Install dependencies for the client
-$ npm i
+$ npm run bootstrap
 
 # Start the app
 $ npm start
@@ -110,27 +111,19 @@ First you will need to setup environment varibales for testing. To do this:
 - Add your Postgres username and password
 - If needed, adjust any other variables for your testing environment
 
-#### Create a local DB named 'skynet-test'
+#### Test Database Setup
 
-You will only need to run this createdb-test script once, unless you drop the database.
+If you have not done so already, follow the steps above for [Setting Up Your Local Databases](#Setting-Up-Your-Local-Databases).
 
-```bash
-# Navigate to the repository root
-$ cd skynet
-
-# Run script to create the DB
-$ npm run createdb-test
-
-# Enter your password when prompted
-
-# If your Postgres username is something other than 'postgres', # you will first need to replace 'postgres' with your username  # in the 'createdb-test' script in package.json (createdb -O    # <username> -U <username> skynet-test)
-```
-Running the tests:
+#### Running the tests:
 
 ```bash
 # Navigate to the root directory
 $ cd skynet
 
-# Run tests
+# To run all tests
 $ npm test
+
+# To run a single test file, add '-t <test_name>'
+$ npm test -t users.test.js
 ```

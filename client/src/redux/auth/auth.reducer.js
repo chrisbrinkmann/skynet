@@ -18,6 +18,22 @@ export const authReducer = (state = INITIAL_STATE, action) => {
         loading: false,
         user: action.payload,
       };
+    case REGISTRATION_SUCCESS :
+      localStorage.setItem('token', action.payload.token);
+      return {
+        ...state,
+        ...action.payload,
+        isAuthenticated: true,
+        loading: false,
+      };
+    case REGISTRATION_FAIL :
+      localStorage.removeItem('token');
+      return {
+        ...state,
+        token: null,
+        isAuthenticated: false,
+        loading: false,
+      };
     default :
       return state;
   };

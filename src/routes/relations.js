@@ -3,7 +3,7 @@ const router = express.Router()
 const Relation = require('../models/Relation')
 const User = require('../models/User')
 const auth = require('../middleware/auth')
-const { formatPendingRelation, getRelation } = require('../utils/utils')
+const { formatPendingRelation, getRelation, getFriendRelations, populateFriendsList } = require('../utils/utils')
 
 // send friend request
 router.post('/request/:friend_id', auth, async (req, res) => {
@@ -59,13 +59,28 @@ router.post('/request/:friend_id', auth, async (req, res) => {
 })
 
 // get all relations
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
   try {
     const relations = await Relation.findAll()
 
     res.status(200).send(relations)
   } catch (err) {
-    res.status(400).send(err)
+    res.status(500).send('Server Error')
+  }
+})
+
+// get friends list
+router.get('/friends-list', auth, async (req, res) => {
+  try {
+    // query db for all friend relations with req user
+    const friendRelations = await getFriendRelations(req.user.id)
+
+    // populate friends list with friend id, name, and avatar
+    const friendsList = await populateFriendsList(friendRelations, req.user.id)
+
+    res.status(200).json(friendsList)
+  } catch (err) {
+    res.status(500).send('Server Error')
   }
 })
 

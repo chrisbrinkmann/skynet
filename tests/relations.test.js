@@ -4,7 +4,7 @@ const app = require('../src/app')
 const Relation = require('../src/models/Relation')
 const User = require('../src/models/User')
 const { syncDatabase, tokens, dbUsers, dbRelations } = require('./fixtures/db')
-const { getRelation } = require('../src/utils/utils')
+const { getRelation, getFriendRelations } = require('../src/utils/utils')
 
 beforeEach(syncDatabase)
 
@@ -379,4 +379,88 @@ test('Should send applicable http response when delete relation id syntax is inv
 
   // assert http response msg to match expected
   expect(response.body.msg).toEqual('User not found')
+})
+
+/**
+ * Get friends list endpoint tests
+ */
+
+test('Should return array of objects representing users friends when getting friend list', async () => {
+  // cache req user object from auth token payload
+  const decoded = jwt.verify(tokens[0], process.env.JWT_SECRET)
+
+  // query db for dbUsers[0] friends relations
+  const friends = await getFriendRelations(decoded.id)
+
+  // assert dbUser[0] has 2 friends relations
+  expect(friends.length).toBe(2)
+
+  // dbUsers[0] gets their friends list
+  const response = await request(app)
+    .get(`/relations/friends-list`)
+    .set('x-auth-token', tokens[0])
+    .expect(200) // assert http res code
+
+  // assert http response contains correct number of friends
+  expect(response.body.length).toBe(2)
+
+  // assert http response friends have 'id' ,'name', and 'avatar' properties
+  expect(response.body[0].hasOwnProperty('id'))
+  expect(response.body[1].hasOwnProperty('id'))
+  expect(response.body[0].hasOwnProperty('name'))
+  expect(response.body[1].hasOwnProperty('name'))
+  expect(response.body[0].hasOwnProperty('avatar'))
+  expect(response.body[1].hasOwnProperty('avatar'))
+})
+
+test('Should update friends list when a friend is unfriended', async () => {
+  // dbUsers[0] gets their friends list
+  let response = await request(app)
+    .get(`/relations/friends-list`)
+    .set('x-auth-token', tokens[0])
+    .expect(200) // assert http res code
+
+  // assert http response contains correct number of friends
+  expect(response.body.length).toBe(2)
+
+  // dbUsers[0] unfriends dbUsers[3]
+  await request(app)
+    .delete(`/relations/${dbUsers[3].id}`)
+    .set('x-auth-token', tokens[0])
+    .expect(200) // assert http res code
+
+  // dbUsers[0] gets their friends list again
+  response = await request(app)
+    .get(`/relations/friends-list`)
+    .set('x-auth-token', tokens[0])
+    .expect(200) // assert http res code
+
+  // assert http response contains 1 less friend :(
+  expect(response.body.length).toBe(1)
+})
+
+test('Should update friends list when a friend is added', async () => {
+  // dbUsers[0] gets their friends list
+  let response = await request(app)
+    .get(`/relations/friends-list`)
+    .set('x-auth-token', tokens[0])
+    .expect(200) // assert http res code
+
+  // assert http response contains correct number of friends
+  expect(response.body.length).toBe(2)
+
+  // dbUsers[0] accepts a pending freind request from dbUsers[2]
+  await request(app)
+    .patch(`/relations/accept/${dbUsers[2].id}`)
+    .set('x-auth-token', tokens[0])
+    .expect(201) // assert http res code
+
+  // dbUsers[0] gets their friends list again
+  response = await request(app)
+    .get(`/relations/friends-list`)
+    .set('x-auth-token', tokens[0])
+    .expect(200) // assert http res code
+
+  // assert http response contains 1 more friend :)
+  expect(response.body.length).toBe(3)
 })

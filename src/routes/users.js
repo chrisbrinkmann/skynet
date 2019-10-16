@@ -9,7 +9,10 @@ const {
   createAuthToken,
   createUser,
   registerValidatorChecks,
-  loginValidatorChecks
+  loginValidatorChecks,
+  getFriendsCount,
+  areFriends,
+  populateUserPosts
 } = require('../utils/utils')
 
 // register a new user, returns a JWT
@@ -89,6 +92,47 @@ router.get('/', auth, async (req, res) => {
 
     res.status(200).json(users)
   } catch (err) {
+    res.status(500).send('Server Error')
+  }
+})
+
+// get user profile
+router.get('/profile/:user_id', auth, async (req, res) => {
+  try {
+    // confirm user to get profile for exists in db
+    const user = await User.findOne({
+      where: { id: req.params.user_id },
+      attributes: ['id', 'name', 'avatar', 'bio']
+    })
+
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' })
+    }
+
+    // create profile object to return to client
+    let profile = {
+      id: user.dataValues.id,
+      name: user.dataValues.name,
+      avatar: user.dataValues.avatar
+    }
+
+    // if req user is getting own or friends profile,
+    // include the requested users bio, #friends, and posts
+    if (
+      req.user.id === user.dataValues.id ||
+      (await areFriends(req.user.id, user.dataValues.id))
+    ) {
+      profile.bio = user.dataValues.bio
+      profile.num_friends = await getFriendsCount(user.dataValues.id)
+      profile.posts = await populateUserPosts(user.dataValues.id)
+    }
+
+    res.status(200).json(profile)
+  } catch (err) {
+    if (err.message.match(/^(invalid input syntax for integer)/)) {
+      // this message will trigger iff non integer is put in req param
+      return res.status(400).json({ msg: 'User not found' })
+    }
     res.status(500).send('Server Error')
   }
 })

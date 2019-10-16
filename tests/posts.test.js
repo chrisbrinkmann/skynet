@@ -3,7 +3,8 @@ const jwt = require('jsonwebtoken')
 const app = require('../src/app')
 const Post = require('../src/models/Post')
 const Comment = require('../src/models/Comment')
-const { syncDatabase, tokens, dbPosts } = require('./fixtures/db')
+const { syncDatabase, tokens, dbPosts, dbUsers } = require('./fixtures/db')
+const { getFriendIds } = require('../src/utils/utils')
 
 beforeEach(syncDatabase)
 
@@ -116,9 +117,7 @@ test('Should not delete a post when the deleter does not own post', async () => 
   expect(post).not.toBeNull()
 
   // assert http response msg to match expected
-  expect(response.body.msg).toEqual(
-    'Cannot delete another users post'
-  )
+  expect(response.body.msg).toEqual('Cannot delete another users post')
 })
 
 test('Should send applicable http response when deleting non existant post', async () => {
@@ -149,4 +148,67 @@ test('Should send applicable http response when delete post id syntax is invalid
 
   // assert http response msg to match expected
   expect(response.body.msg).toEqual('Post not found')
+})
+
+/**
+ * Newsfeed tests
+ */
+
+test('Should return newsfeed array of objects with posts of all friends and self', async () => {
+  // cache req user object from auth token payload
+  const decoded = jwt.verify(tokens[0], process.env.JWT_SECRET)
+
+  // cache friend ids including self (dbUsers[0])
+  let friend_ids = await getFriendIds(decoded.id)
+  friend_ids.push(decoded.id)
+
+  // dbUsers[0] gets their newsfeed
+  const response = await request(app)
+    .get(`/posts/newsfeed`)
+    .set('x-auth-token', tokens[0])
+    .expect(200) // assert http res code
+
+  // assert http response contains correct number of posts
+  expect(response.body.length).toBe(4)
+
+  // assert each post in response is owned by a friend or self
+  // and has expected properties
+  response.body.forEach(post => {
+    expect(friend_ids).toContain(post.user_id)
+    expect(post).toHaveProperty('id')
+    expect(post).toHaveProperty('user_id')
+    expect(post).toHaveProperty('user_name')
+    expect(post).toHaveProperty('user_avatar')
+    expect(post).toHaveProperty('content')
+    expect(post).toHaveProperty('comments')
+  })
+})
+
+test('Should return newsfeed array posts in order newest to oldest', async () => {
+  // dbUsers[0] gets their newsfeed
+  const response = await request(app)
+    .get(`/posts/newsfeed`)
+    .set('x-auth-token', tokens[0])
+    .expect(200) // assert http res code
+
+  // assert each post has a greater id (created more recently) than the following post
+  for (let i = 0; i < response.body.length - 1; i++) {
+    expect(response.body[i].id).toBeGreaterThan(response.body[i + 1].id)
+  }
+})
+
+test('Should return newsfeed array post comments in order oldest to newest', async () => {
+  // dbUsers[0] gets their newsfeed
+  const response = await request(app)
+    .get(`/posts/newsfeed`)
+    .set('x-auth-token', tokens[0])
+    .expect(200) // assert http res code
+
+  // assert each comment has a lower id (created ealier) than the following post
+  for (let i = 0; i < response.body.length; i++) {
+    for (let j = 0; j < response.body[i].comments.length - 1; j++)
+      expect(response.body[i].comments[j].id).toBeLessThan(
+        response.body[i].comments[j + 1].id
+      )
+  }
 })

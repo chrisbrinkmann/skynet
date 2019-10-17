@@ -20,17 +20,14 @@ module.exports = async function(req, res, next) {
   }
 
   try {
-    // cache the user object (payload returned from jwt.verify)
+    // cache the user id (payload returned from jwt.verify)
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
     // confirm id in token payload matches an existing user
     const user = await User.findOne({ where: { id: decoded.id } })
     if (!user) throw new Error()
 
-    // remove the password field
-    delete decoded.password
-
-    // attach the user object to the request
+    // attach the user id to the request
     req.user = decoded
 
     // call next to proceed to the route

@@ -122,18 +122,18 @@ const syncDatabase = async () => {
   })
 
   // login sample users (create auth tokens)
-  const dbUserOneToken = jwt.sign(dbUserOne.dataValues, process.env.JWT_SECRET)
-  const dbUserTwoToken = jwt.sign(dbUserTwo.dataValues, process.env.JWT_SECRET)
+  const dbUserOneToken = jwt.sign({ id: dbUserOne.id }, process.env.JWT_SECRET)
+  const dbUserTwoToken = jwt.sign({ id: dbUserTwo.id }, process.env.JWT_SECRET)
   const dbUserThreeToken = jwt.sign(
-    dbUserThree.dataValues,
+    { id: dbUserThree.id },
     process.env.JWT_SECRET
   )
   const dbUserFourToken = jwt.sign(
-    dbUserFour.dataValues,
+    { id: dbUserFour.id },
     process.env.JWT_SECRET
   )
   const dbUserFiveToken = jwt.sign(
-    dbUserFive.dataValues,
+    { id: dbUserFive.id },
     process.env.JWT_SECRET
   )
 

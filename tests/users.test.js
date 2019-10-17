@@ -361,7 +361,7 @@ test('Should update users name when name is provided', async () => {
   let user = await User.findOne({ where: { id: decoded.id } })
 
   // assert dbUsers[0] name before update
-  expect(user.dataValues.name).toEqual('Chris')
+  expect(user.name).toEqual('Chris')
 
   // dbUsers[0] updates their name
   const response = await request(app)
@@ -374,7 +374,7 @@ test('Should update users name when name is provided', async () => {
   user = await User.findOne({ where: { id: decoded.id } })
 
   // assert updated user name was inserted to db
-  expect(user.dataValues.name).toEqual('Art Vandalay')
+  expect(user.name).toEqual('Art Vandalay')
 
   // assert response body message matches expected
   expect(response.body.msg).toEqual(
@@ -390,7 +390,7 @@ test('Should not update users name when no name is provided', async () => {
   let user = await User.findOne({ where: { id: decoded.id } })
 
   // assert dbUsers[0] name before update
-  expect(user.dataValues.name).toEqual('Chris')
+  expect(user.name).toEqual('Chris')
 
   // dbUsers[0] updates their name
   const response = await request(app)
@@ -403,7 +403,7 @@ test('Should not update users name when no name is provided', async () => {
   user = await User.findOne({ where: { id: decoded.id } })
 
   // assert user name in db remains the same
-  expect(user.dataValues.name).toEqual('Chris')
+  expect(user.name).toEqual('Chris')
 
   // assert response body matches expected
   expect(response.body).toHaveProperty('errors')
@@ -417,7 +417,7 @@ test('Should update users bio when bio is provided', async () => {
   let user = await User.findOne({ where: { id: decoded.id } })
 
   // assert dbUsers[0] bio before update
-  expect(user.dataValues.bio).toBeNull()
+  expect(user.bio).toBeNull()
 
   // dbUsers[0] updates their bio
   const response = await request(app)
@@ -430,7 +430,7 @@ test('Should update users bio when bio is provided', async () => {
   user = await User.findOne({ where: { id: decoded.id } })
 
   // assert updated user bio was inserted to db
-  expect(user.dataValues.bio).toEqual('I am an importer/exporter')
+  expect(user.bio).toEqual('I am an importer/exporter')
 
   // assert response body message matches expected
   expect(response.body.msg).toEqual(
@@ -446,7 +446,7 @@ test('Should not update users bio when no bio is provided', async () => {
   let user = await User.findOne({ where: { id: decoded.id } })
 
   // assert dbUsers[0] bio before update
-  expect(user.dataValues.bio).toBeNull()
+  expect(user.bio).toBeNull()
 
   // dbUsers[0] updates their bio
   const response = await request(app)
@@ -459,7 +459,7 @@ test('Should not update users bio when no bio is provided', async () => {
   user = await User.findOne({ where: { id: decoded.id } })
 
   // assert user bio in db remains the same
-  expect(user.dataValues.bio).toBeNull()
+  expect(user.bio).toBeNull()
 
   // assert response body matches expected
   expect(response.body).toHaveProperty('errors')
@@ -473,7 +473,7 @@ test('Should update users email when valid email is provided', async () => {
   let user = await User.findOne({ where: { id: decoded.id } })
 
   // assert dbUsers[0] email before update
-  expect(user.dataValues.email).toEqual('chris@example.com')
+  expect(user.email).toEqual('chris@example.com')
 
   // dbUsers[0] updates their email
   const response = await request(app)
@@ -486,7 +486,7 @@ test('Should update users email when valid email is provided', async () => {
   user = await User.findOne({ where: { id: decoded.id } })
 
   // assert updated user email was inserted to db
-  expect(user.dataValues.email).toEqual('stevejobs@skynet.com')
+  expect(user.email).toEqual('stevejobs@skynet.com')
 
   // assert response body message matches expected
   expect(response.body.msg).toEqual(
@@ -502,7 +502,7 @@ test('Should not update users email when invalid email is provided', async () =>
   let user = await User.findOne({ where: { id: decoded.id } })
 
   // assert dbUsers[0] email before update
-  expect(user.dataValues.email).toEqual('chris@example.com')
+  expect(user.email).toEqual('chris@example.com')
 
   // dbUsers[0] updates their email with invalid address
   const response = await request(app)
@@ -515,7 +515,7 @@ test('Should not update users email when invalid email is provided', async () =>
   user = await User.findOne({ where: { id: decoded.id } })
 
   // assert previous email in db remains the same
-  expect(user.dataValues.email).toEqual('chris@example.com')
+  expect(user.email).toEqual('chris@example.com')
 
   // assert response body matches expected
   expect(response.body).toHaveProperty('errors')

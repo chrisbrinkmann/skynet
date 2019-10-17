@@ -40,7 +40,7 @@ const registerValidatorChecks = () => {
   ]
 }
 
-// returns an array off express-validator checks
+// returns an array of express-validator checks
 const loginValidatorChecks = () => {
   return [
     check('email', 'Please include a valid email')
@@ -52,7 +52,7 @@ const loginValidatorChecks = () => {
   ]
 }
 
-// returns an array off express-validator checks
+// returns an array of express-validator checks
 const fieldValidatorChecks = field => {
   return [
     check(`${field}`, `${field} is required`)
@@ -61,7 +61,7 @@ const fieldValidatorChecks = field => {
   ]
 }
 
-// returns an array off express-validator checks
+// returns an array of express-validator checks
 const emailValidatorChecks = () => {
   return [
     check('email', 'Please include a valid email')
@@ -70,21 +70,27 @@ const emailValidatorChecks = () => {
   ]
 }
 
-// returns an array off express-validator checks
+// returns an array of express-validator checks
 const passwordValidatorChecks = () => {
   return [
-    check('password', 'Please enter a password with 6 or more characters')
-    .isLength({ min: 6 })
+    check(
+      'password',
+      'Please enter a password with 6 or more characters'
+    ).isLength({ min: 6 })
   ]
 }
 
-// generate a url for an avatar
+// generate email hash and return link to gravatar image
 const setAvatar = email => {
-  return gravatar.url(email, {
-    s: '200', // size
-    r: 'r', // rating
-    d: 'robohash' // default img, if none from email
-  }, true)
+  return gravatar.url(
+    email,
+    {
+      s: '200', // size
+      r: 'r', // rating
+      d: 'robohash' // default img, if none from email
+    },
+    true
+  )
 }
 
 // returns a properly formatted object for insertion to relations table
@@ -111,7 +117,7 @@ const areFriends = async (first_user_id, second_user_id) => {
   const relation = await getRelation(first_user_id, second_user_id)
 
   // return false if there is no friends relation
-  if (!relation || relation.dataValues.relationType !== 'friends') return false
+  if (!relation || relation.relationType !== 'friends') return false
 
   return true
 }
@@ -141,7 +147,7 @@ const getRelation = async (first_user_id, second_user_id) => {
 // return array of friends db relations
 const getFriendRelations = async user_id => {
   // query db
-  let friends = await Relation.findAll({
+  const friends = await Relation.findAll({
     where: {
       [Op.or]: [
         { first_user_id: { [Op.eq]: user_id } },
@@ -149,11 +155,6 @@ const getFriendRelations = async user_id => {
       ],
       relationType: 'friends'
     }
-  })
-
-  // trim extraneous data from db query result
-  friends = friends.map(friend => {
-    return friend.dataValues
   })
 
   return friends
@@ -185,31 +186,32 @@ const getFriendIds = async user_id => {
 }
 
 // returns a formatted friends list array with friend id, name, avatar
-const populateFriendsList = async (friendRelations, user_id) => {
+const populateFriendsList = async user_id => {
   // cache friend ids
   let friend_ids = await getFriendIds(user_id)
 
   // create cache of friend objects
   let friendsList = []
 
-  // add object with friend id to friendsList for each friend
-  friend_ids.map(id => {
-    return friendsList.push({ id })
-  })
-
-  // add friend user.name and user.avatar to each friendsList object
-  friendsList = await Promise.all(
-    friendsList.map(async friend => {
-      const user = await User.findOne({ where: { id: friend.id } })
-
-      friend.name = user.dataValues.name
-      friend.avatar = user.dataValues.avatar
-
-      return friend
+  // forEach friend id, add the formatted friend
+  await Promise.all(
+    friend_ids.map(async friend_id => {
+      friendsList.push(await getFormattedFriend(friend_id))
     })
   )
 
   return friendsList
+}
+
+// returns a formatted friend object for display in friend list
+const getFormattedFriend = async friend_id => {
+  const friend = await User.findOne({ where: { id: friend_id } })
+
+  return {
+    id: friend.id,
+    name: friend.name,
+    avatar: friend.avatar
+  }
 }
 
 // returns array of formatted post objects owned by the param user
@@ -227,7 +229,7 @@ const populateUserPosts = async user_id => {
   // for each post get add the formatted post to the array
   const userPosts = Promise.all(
     postIds.map(async postId => {
-      return await getFormattedPost(postId.dataValues.id)
+      return await getFormattedPost(postId.id)
     })
   )
 
@@ -255,7 +257,7 @@ const populateNewsFeed = async user_id => {
   // for each post get add the formatted post to the array
   const newsFeed = Promise.all(
     friendPosts.map(async post => {
-      return await getFormattedPost(post.dataValues.id)
+      return await getFormattedPost(post.id)
     })
   )
 
@@ -264,15 +266,21 @@ const populateNewsFeed = async user_id => {
 
 // returns a formatted post object with comments array
 const getFormattedPost = async post_id => {
-  const post = await Post.findOne({ where: { id: post_id } })
-  const user = await User.findOne({ where: { id: post.dataValues.user_id } })
+  const post = await Post.findOne({
+    where: { id: post_id },
+    attributes: ['id', 'content', 'user_id']
+  })
+  const user = await User.findOne({
+    where: { id: post.user_id },
+    attributes: ['id', 'name', 'avatar']
+  })
 
   return {
-    id: post.dataValues.id,
-    user_id: user.dataValues.id,
-    user_name: user.dataValues.name,
-    user_avatar: user.dataValues.avatar,
-    content: post.dataValues.content,
+    id: post.id,
+    user_id: user.id,
+    user_name: user.name,
+    user_avatar: user.avatar,
+    content: post.content,
     comments: await getFormattedPostComments(post_id)
   }
 }
@@ -290,7 +298,7 @@ const getFormattedPostComments = async postId => {
   // for each comment add the formatted comment to the array
   const postComments = Promise.all(
     comments.map(async comment => {
-      return await getFormattedComment(comment.dataValues.id)
+      return await getFormattedComment(comment.id)
     })
   )
 
@@ -304,16 +312,16 @@ const getFormattedComment = async comment_id => {
     attributes: ['id', 'user_id', 'content']
   })
   const user = await User.findOne({
-    where: { id: comment.dataValues.user_id },
+    where: { id: comment.user_id },
     attributes: ['id', 'name', 'avatar']
   })
 
   return {
-    id: comment.dataValues.id,
-    user_id: user.dataValues.id,
-    user_name: user.dataValues.name,
-    user_avatar: user.dataValues.avatar,
-    content: comment.dataValues.content
+    id: comment.id,
+    user_id: user.id,
+    user_name: user.name,
+    user_avatar: user.avatar,
+    content: comment.content
   }
 }
 

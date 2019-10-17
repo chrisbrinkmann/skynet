@@ -2,6 +2,7 @@ const request = require('supertest')
 const Sequelize = require('sequelize')
 const Op = Sequelize.Op
 const jwt = require('jsonwebtoken')
+const bcrypt = require('bcryptjs')
 const app = require('../src/app')
 const User = require('../src/models/User')
 const Relation = require('../src/models/Relation')
@@ -316,34 +317,266 @@ test('Should return limited profile data when valid non friend id is provided', 
     .get(`/users/profile/${dbUsers[1].id}`)
     .set('x-auth-token', tokens[0])
     .expect(200) // assert http res code
-  
-    // assert http res body matches expected
-    expect(response.body).toHaveProperty('id')
-    expect(response.body).toHaveProperty('name')
-    expect(response.body).toHaveProperty('avatar')
-    expect(response.body).not.toHaveProperty('bio')
-    expect(response.body).not.toHaveProperty('num_friends')
-    expect(response.body).not.toHaveProperty('posts')
+
+  // assert http res body matches expected
+  expect(response.body).toHaveProperty('id')
+  expect(response.body).toHaveProperty('name')
+  expect(response.body).toHaveProperty('avatar')
+  expect(response.body).not.toHaveProperty('bio')
+  expect(response.body).not.toHaveProperty('num_friends')
+  expect(response.body).not.toHaveProperty('posts')
 })
 
 test('Should not get profile for non existant user', async () => {
-// dbUsers[0] gets profile for user with id 99 (does not exist)
+  // dbUsers[0] gets profile for user with id 99 (does not exist)
   const response = await request(app)
     .get(`/users/profile/99`)
     .set('x-auth-token', tokens[0])
     .expect(404) // assert http res code
-  
+
   // assert response body message matches expected
   expect(response.body.msg).toEqual('User not found')
 })
 
 test('Should not get profile when user id syntax is invalid (non integer)', async () => {
   // dbUsers[0] gets profile for user with invalid id: asdf (does not exist)
-    const response = await request(app)
-      .get(`/users/profile/asdf`)
-      .set('x-auth-token', tokens[0])
-      .expect(400) // assert http res code
-    
-    // assert response body message matches expected
-    expect(response.body.msg).toEqual('User not found')
-  })
+  const response = await request(app)
+    .get(`/users/profile/asdf`)
+    .set('x-auth-token', tokens[0])
+    .expect(400) // assert http res code
+
+  // assert response body message matches expected
+  expect(response.body.msg).toEqual('User not found')
+})
+
+/**
+ * Update user endpoint tests
+ */
+
+test('Should update users name when name is provided', async () => {
+  // cache the req user object from the auth token payload
+  const decoded = jwt.verify(tokens[0], process.env.JWT_SECRET)
+
+  // query db for dbUser[0]
+  let user = await User.findOne({ where: { id: decoded.id } })
+
+  // assert dbUsers[0] name before update
+  expect(user.dataValues.name).toEqual('Chris')
+
+  // dbUsers[0] updates their name
+  const response = await request(app)
+    .patch('/users/name')
+    .set('x-auth-token', tokens[0])
+    .send({ name: 'Art Vandalay' })
+    .expect(200) // assert http res code
+
+  // query db for updated user
+  user = await User.findOne({ where: { id: decoded.id } })
+
+  // assert updated user name was inserted to db
+  expect(user.dataValues.name).toEqual('Art Vandalay')
+
+  // assert response body message matches expected
+  expect(response.body.msg).toEqual(
+    `Your name has been updated to: 'Art Vandalay'`
+  )
+})
+
+test('Should not update users name when no name is provided', async () => {
+  // cache the req user object from the auth token payload
+  const decoded = jwt.verify(tokens[0], process.env.JWT_SECRET)
+
+  // query db for dbUser[0]
+  let user = await User.findOne({ where: { id: decoded.id } })
+
+  // assert dbUsers[0] name before update
+  expect(user.dataValues.name).toEqual('Chris')
+
+  // dbUsers[0] updates their name
+  const response = await request(app)
+    .patch('/users/name')
+    .set('x-auth-token', tokens[0])
+    .send({ name: '' })
+    .expect(400) // assert http res code
+
+  // query db for attempted updated user
+  user = await User.findOne({ where: { id: decoded.id } })
+
+  // assert user name in db remains the same
+  expect(user.dataValues.name).toEqual('Chris')
+
+  // assert response body matches expected
+  expect(response.body).toHaveProperty('errors')
+})
+
+test('Should update users bio when bio is provided', async () => {
+  // cache the req user object from the auth token payload
+  const decoded = jwt.verify(tokens[0], process.env.JWT_SECRET)
+
+  // query db for dbUser[0]
+  let user = await User.findOne({ where: { id: decoded.id } })
+
+  // assert dbUsers[0] bio before update
+  expect(user.dataValues.bio).toBeNull()
+
+  // dbUsers[0] updates their bio
+  const response = await request(app)
+    .patch('/users/bio')
+    .set('x-auth-token', tokens[0])
+    .send({ bio: 'I am an importer/exporter' })
+    .expect(200) // assert http res code
+
+  // query db for updated user
+  user = await User.findOne({ where: { id: decoded.id } })
+
+  // assert updated user bio was inserted to db
+  expect(user.dataValues.bio).toEqual('I am an importer/exporter')
+
+  // assert response body message matches expected
+  expect(response.body.msg).toEqual(
+    `Your bio has been updated to: 'I am an importer/exporter'`
+  )
+})
+
+test('Should not update users bio when no bio is provided', async () => {
+  // cache the req user object from the auth token payload
+  const decoded = jwt.verify(tokens[0], process.env.JWT_SECRET)
+
+  // query db for dbUser[0]
+  let user = await User.findOne({ where: { id: decoded.id } })
+
+  // assert dbUsers[0] bio before update
+  expect(user.dataValues.bio).toBeNull()
+
+  // dbUsers[0] updates their bio
+  const response = await request(app)
+    .patch('/users/bio')
+    .set('x-auth-token', tokens[0])
+    .send({ bio: '' })
+    .expect(400) // assert http res code
+
+  // query db for attempted updated user
+  user = await User.findOne({ where: { id: decoded.id } })
+
+  // assert user bio in db remains the same
+  expect(user.dataValues.bio).toBeNull()
+
+  // assert response body matches expected
+  expect(response.body).toHaveProperty('errors')
+})
+
+test('Should update users email when valid email is provided', async () => {
+  // cache the req user object from the auth token payload
+  const decoded = jwt.verify(tokens[0], process.env.JWT_SECRET)
+
+  // query db for dbUser[0]
+  let user = await User.findOne({ where: { id: decoded.id } })
+
+  // assert dbUsers[0] email before update
+  expect(user.dataValues.email).toEqual('chris@example.com')
+
+  // dbUsers[0] updates their email
+  const response = await request(app)
+    .patch('/users/email')
+    .set('x-auth-token', tokens[0])
+    .send({ email: 'stevejobs@skynet.com' })
+    .expect(200) // assert http res code
+
+  // query db for updated user
+  user = await User.findOne({ where: { id: decoded.id } })
+
+  // assert updated user email was inserted to db
+  expect(user.dataValues.email).toEqual('stevejobs@skynet.com')
+
+  // assert response body message matches expected
+  expect(response.body.msg).toEqual(
+    `Your email has been updated to: 'stevejobs@skynet.com'`
+  )
+})
+
+test('Should not update users email when invalid email is provided', async () => {
+  // cache the req user object from the auth token payload
+  const decoded = jwt.verify(tokens[0], process.env.JWT_SECRET)
+
+  // query db for dbUser[0]
+  let user = await User.findOne({ where: { id: decoded.id } })
+
+  // assert dbUsers[0] email before update
+  expect(user.dataValues.email).toEqual('chris@example.com')
+
+  // dbUsers[0] updates their email with invalid address
+  const response = await request(app)
+    .patch('/users/email')
+    .set('x-auth-token', tokens[0])
+    .send({ email: 'invalidemail.com' })
+    .expect(400) // assert http res code
+
+  // query db for attempted updated user
+  user = await User.findOne({ where: { id: decoded.id } })
+
+  // assert previous email in db remains the same
+  expect(user.dataValues.email).toEqual('chris@example.com')
+
+  // assert response body matches expected
+  expect(response.body).toHaveProperty('errors')
+})
+
+test('Should update users password when valid password is provided', async () => {
+  // cache the req user object from the auth token payload
+  const decoded = jwt.verify(tokens[0], process.env.JWT_SECRET)
+
+  // query db for dbUser[0]
+  let user = await User.findOne({ where: { id: decoded.id } })
+
+  // assert dbUsers[0] password ('123456') hash is in db before update
+  expect(
+    await bcrypt.compare(sampleUserData[0].password, user.password)
+  ).toBeTruthy()
+
+  // dbUsers[0] updates their password
+  const response = await request(app)
+    .patch('/users/password')
+    .set('x-auth-token', tokens[0])
+    .send({ password: 'asdf1234' })
+    .expect(200) // assert http res code
+
+  // query db for updated user
+  user = await User.findOne({ where: { id: decoded.id } })
+
+  // assert updated password hash is now stored in db
+  expect(await bcrypt.compare('asdf1234', user.password)).toBeTruthy()
+
+  // assert response body message matches expected
+  expect(response.body.msg).toEqual(`Your password has been updated`)
+})
+
+test('Should not update users password when password is too short', async () => {
+  // cache the req user object from the auth token payload
+  const decoded = jwt.verify(tokens[0], process.env.JWT_SECRET)
+
+  // query db for dbUser[0]
+  let user = await User.findOne({ where: { id: decoded.id } })
+
+  // assert dbUsers[0] password ('123456') hash is in db before update
+  expect(
+    await bcrypt.compare(sampleUserData[0].password, user.password)
+  ).toBeTruthy()
+
+  // dbUsers[0] updates their password with password that is too short
+  const response = await request(app)
+    .patch('/users/password')
+    .set('x-auth-token', tokens[0])
+    .send({ password: '12345' })
+    .expect(400) // assert http res code
+
+  // query db for attempted updated user
+  user = await User.findOne({ where: { id: decoded.id } })
+
+  // assert previous password in db remains the same
+  expect(
+    await bcrypt.compare(sampleUserData[0].password, user.password)
+  ).toBeTruthy()
+
+  // assert response body matches expected
+  expect(response.body).toHaveProperty('errors')
+})

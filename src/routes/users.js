@@ -10,6 +10,9 @@ const {
   createUser,
   registerValidatorChecks,
   loginValidatorChecks,
+  fieldValidatorChecks,
+  emailValidatorChecks,
+  passwordValidatorChecks,
   getFriendsCount,
   areFriends,
   populateUserPosts
@@ -133,6 +136,122 @@ router.get('/profile/:user_id', auth, async (req, res) => {
       // this message will trigger iff non integer is put in req param
       return res.status(400).json({ msg: 'User not found' })
     }
+    res.status(500).send('Server Error')
+  }
+})
+
+// update user name
+router.patch(
+  '/name',
+  [auth, fieldValidatorChecks('name')],
+  async (req, res) => {
+    const errors = validationResult(req) // run checks on req
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() })
+    }
+
+    const { name } = req.body // cache req data
+
+    try {
+      // query db for req user
+      let user = await User.findOne({
+        where: { id: req.user.id },
+        attributes: { exclude: ['password'] }
+      })
+
+      // update user name; insert to db
+      user = await user.update({
+        name
+      })
+
+      res.status(200).json({ msg: `Your name has been updated to: '${name}'` })
+    } catch (err) {
+      res.status(500).send('Server Error')
+    }
+  }
+)
+
+// update user bio
+router.patch('/bio', [auth, fieldValidatorChecks('bio')], async (req, res) => {
+  const errors = validationResult(req) // run checks on req
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() })
+  }
+
+  const { bio } = req.body // cache req data
+
+  try {
+    // query db for req user
+    let user = await User.findOne({
+      where: { id: req.user.id },
+      attributes: { exclude: ['password'] }
+    })
+
+    // update user bio; insert to db
+    user = await user.update({
+      bio
+    })
+
+    res.status(200).json({ msg: `Your bio has been updated to: '${bio}'` })
+  } catch (err) {
+    res.status(500).send('Server Error')
+  }
+})
+
+// update user email (also updates gravatar email)
+router.patch('/email', [auth, emailValidatorChecks()], async (req, res) => {
+  const errors = validationResult(req) // run checks on req
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() })
+  }
+
+  const { email } = req.body // cache req data
+
+  try {
+    // query db for req user
+    let user = await User.findOne({
+      where: { id: req.user.id },
+      attributes: { exclude: ['password'] }
+    })
+
+    // update user email, avater; insert to db
+    user = await user.update({
+      email,
+      avatar: setAvatar(email)
+    })
+
+    res.status(200).json({ msg: `Your email has been updated to: '${email}'` })
+  } catch (err) {
+    res.status(500).send('Server Error')
+  }
+})
+
+// update user password
+router.patch('/password', [auth, passwordValidatorChecks()], async (req, res) => {
+  const errors = validationResult(req) // run checks on req
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() })
+  }
+
+  let { password } = req.body // cache req data
+
+  try {
+    // query db for req user
+    let user = await User.findOne({
+      where: { id: req.user.id },
+      attributes: { exclude: ['password'] }
+    })
+
+    // encrypt the new password
+    password = await bcrypt.hash(password, 8)
+
+    // update the user password, insert to db
+    user = await user.update({
+      password
+    })
+
+    res.status(200).json({ msg: `Your password has been updated` })
+  } catch (err) {
     res.status(500).send('Server Error')
   }
 })

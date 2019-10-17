@@ -7,7 +7,13 @@ const User = require('../src/models/User')
 const Relation = require('../src/models/Relation')
 const Post = require('../src/models/Post')
 const Comment = require('../src/models/Comment')
-const { syncDatabase, sampleUserData, tokens } = require('./fixtures/db')
+const {
+  syncDatabase,
+  sampleUserData,
+  dbUsers,
+  tokens
+} = require('./fixtures/db')
+const { areFriends } = require('../src/utils/utils')
 
 beforeEach(syncDatabase)
 
@@ -245,3 +251,99 @@ test('Should delete all users comments when user is deleted', async () => {
   // assert response body msg matches expected
   expect(response.body.msg).toEqual('Hasta la vista, baby')
 })
+
+/**
+ * Get profile endpoint tests
+ */
+
+test('Should return full profile data when users own id is provided', async () => {
+  // dbUsers[0] gets their own profile
+  const response = await request(app)
+    .get(`/users/profile/${dbUsers[0].id}`)
+    .set('x-auth-token', tokens[0])
+    .expect(200) // assert http res code
+
+  // assert http res body matches expected
+  expect(response.body).toHaveProperty('id')
+  expect(response.body).toHaveProperty('name')
+  expect(response.body).toHaveProperty('avatar')
+  expect(response.body).toHaveProperty('bio')
+  expect(response.body).toHaveProperty('num_friends')
+  expect(response.body).toHaveProperty('posts')
+
+  // assert all posts belong to requested user
+  response.body.posts.forEach(post => {
+    expect(post.user_id).toEqual(dbUsers[0].id)
+  })
+})
+
+test('Should return full profile data when users friend id is provided', async () => {
+  // cache the req user object from the auth token payload
+  const decoded = jwt.verify(tokens[0], process.env.JWT_SECRET)
+
+  // assert that dbUsers[0] and dbUsers[3] are friends
+  expect(await areFriends(decoded.id, dbUsers[3].id)).toBeTruthy()
+
+  // dbUsers[0] gets dbUsers[3] profile
+  const response = await request(app)
+    .get(`/users/profile/${dbUsers[3].id}`)
+    .set('x-auth-token', tokens[0])
+    .expect(200) // assert http res code
+
+  // assert http res body matches expected
+  expect(response.body).toHaveProperty('id')
+  expect(response.body).toHaveProperty('name')
+  expect(response.body).toHaveProperty('avatar')
+  expect(response.body).toHaveProperty('bio')
+  expect(response.body).toHaveProperty('num_friends')
+  expect(response.body).toHaveProperty('posts')
+
+  // assert all posts belong to requested user
+  response.body.posts.forEach(post => {
+    expect(post.user_id).toEqual(dbUsers[3].id)
+  })
+})
+
+test('Should return limited profile data when valid non friend id is provided', async () => {
+  // cache the req user object from the auth token payload
+  const decoded = jwt.verify(tokens[0], process.env.JWT_SECRET)
+
+  // assert that dbUsers[0] and dbUsers[1] are not friends
+  expect(await areFriends(decoded.id, dbUsers[1].id)).toBeFalsy()
+
+  // dbUsers[0] gets dbUsers[1] profile
+  const response = await request(app)
+    .get(`/users/profile/${dbUsers[1].id}`)
+    .set('x-auth-token', tokens[0])
+    .expect(200) // assert http res code
+  
+    // assert http res body matches expected
+    expect(response.body).toHaveProperty('id')
+    expect(response.body).toHaveProperty('name')
+    expect(response.body).toHaveProperty('avatar')
+    expect(response.body).not.toHaveProperty('bio')
+    expect(response.body).not.toHaveProperty('num_friends')
+    expect(response.body).not.toHaveProperty('posts')
+})
+
+test('Should not get profile for non existant user', async () => {
+// dbUsers[0] gets profile for user with id 99 (does not exist)
+  const response = await request(app)
+    .get(`/users/profile/99`)
+    .set('x-auth-token', tokens[0])
+    .expect(404) // assert http res code
+  
+  // assert response body message matches expected
+  expect(response.body.msg).toEqual('User not found')
+})
+
+test('Should not get profile when user id syntax is invalid (non integer)', async () => {
+  // dbUsers[0] gets profile for user with invalid id: asdf (does not exist)
+    const response = await request(app)
+      .get(`/users/profile/asdf`)
+      .set('x-auth-token', tokens[0])
+      .expect(400) // assert http res code
+    
+    // assert response body message matches expected
+    expect(response.body.msg).toEqual('User not found')
+  })

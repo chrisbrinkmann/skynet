@@ -141,6 +141,13 @@ const getFriendRelations = async user_id => {
   return friends
 }
 
+// returns count of a users friends
+const getFriendsCount = async user_id => {
+  const friends = await getFriendRelations(user_id)
+
+  return friends.length
+}
+
 // returns an array integer friend ids of user
 const getFriendIds = async user_id => {
   const friendRelations = await getFriendRelations(user_id)
@@ -185,6 +192,28 @@ const populateFriendsList = async (friendRelations, user_id) => {
   )
 
   return friendsList
+}
+
+// returns array of formatted post objects owned by the param user
+const populateUserPosts = async user_id => {
+  // query db for all ids of posts by self
+  const postIds = await Post.findAll({
+    where: {
+      user_id
+    },
+    order: [['id', 'DESC']],
+    attributes: ['id'],
+    limit: 100
+  })
+
+  // for each post get add the formatted post to the array
+  const userPosts = Promise.all(
+    postIds.map(async postId => {
+      return await getFormattedPost(postId.dataValues.id)
+    })
+  )
+
+  return userPosts
 }
 
 // returns newsfeed array of formatted post objects
@@ -281,7 +310,9 @@ module.exports = {
   areFriends,
   getRelation,
   getFriendRelations,
+  getFriendsCount,
   getFriendIds,
   populateFriendsList,
-  populateNewsFeed
+  populateNewsFeed,
+  populateUserPosts
 }

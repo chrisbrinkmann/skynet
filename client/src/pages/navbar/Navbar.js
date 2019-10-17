@@ -2,12 +2,14 @@ import React, { Fragment } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 
+import { logoutUser } from '../../redux/auth/auth.actions';
+
 import SignIn from '../../components-page/sign-in/SignIn';
 
 import style from './navbar.module.scss';
 
 // *************************** NAVBAR COMPONENT *************************** //
-const Navbar = ({ isAuthenticated }) => {
+const Navbar = ({ isAuthenticated, logoutUser }) => {
   const authLinks = (
     <ul className={style.links}>
       <li>
@@ -16,7 +18,7 @@ const Navbar = ({ isAuthenticated }) => {
       <li>
         <NavLink to='/profile/:id' className={style.link} activeClassName={style.active}>Profile</NavLink>
       </li>
-      <span className={style.link}>Logout</span>
+      <span onClick={(e) => logoutUser(e)} className={style.link}>Logout</span>
     </ul>
   );
 
@@ -43,4 +45,8 @@ const mapStateToProps = (state) => ({
   isAuthenticated: state.auth.isAuthenticated,
 });
 
-export default connect(mapStateToProps)(Navbar);
+const mapDispatchToProps = (dispatch) => ({
+  logoutUser: () => dispatch(logoutUser()),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Navbar);

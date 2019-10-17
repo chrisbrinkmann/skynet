@@ -52,11 +52,29 @@ const loginValidatorChecks = () => {
   ]
 }
 
-const contentValidatorChecks = () => {
+// returns an array off express-validator checks
+const fieldValidatorChecks = field => {
   return [
-    check('content', 'content is required')
+    check(`${field}`, `${field} is required`)
       .not()
       .isEmpty()
+  ]
+}
+
+// returns an array off express-validator checks
+const emailValidatorChecks = () => {
+  return [
+    check('email', 'Please include a valid email')
+      .isEmail()
+      .normalizeEmail()
+  ]
+}
+
+// returns an array off express-validator checks
+const passwordValidatorChecks = () => {
+  return [
+    check('password', 'Please enter a password with 6 or more characters')
+    .isLength({ min: 6 })
   ]
 }
 
@@ -64,9 +82,9 @@ const contentValidatorChecks = () => {
 const setAvatar = email => {
   return gravatar.url(email, {
     s: '200', // size
-    r: 'pg', // rating
-    d: 'mp' // default img, if none from email
-  })
+    r: 'r', // rating
+    d: 'robohash' // default img, if none from email
+  }, true)
 }
 
 // returns a properly formatted object for insertion to relations table
@@ -304,7 +322,9 @@ module.exports = {
   createUser,
   registerValidatorChecks,
   loginValidatorChecks,
-  contentValidatorChecks,
+  fieldValidatorChecks,
+  emailValidatorChecks,
+  passwordValidatorChecks,
   setAvatar,
   formatPendingRelation,
   areFriends,

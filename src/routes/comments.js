@@ -4,12 +4,12 @@ const Comment = require('../models/Comment')
 const Post = require('../models/Post')
 const { validationResult } = require('express-validator')
 const auth = require('../middleware/auth')
-const { contentValidatorChecks, areFriends } = require('../utils/utils')
+const { fieldValidatorChecks, areFriends } = require('../utils/utils')
 
 // create new comment
 router.post(
   '/new/:post_id',
-  [auth, contentValidatorChecks()],
+  [auth, fieldValidatorChecks('content')],
   async (req, res) => {
     const errors = validationResult(req) // run checks on req
     if (!errors.isEmpty()) {

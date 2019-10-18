@@ -4,7 +4,7 @@ const port = process.env.PORT || 3000
 
 // sync defined models to the DB tables
 // for each model: drop table if exists, then create new table
-db.sync({ force: true })
+db.sync({ force: false })
   .then(console.log('Defined models synced to DB'))
   .catch(err => console.log('Unable to sync:', err))
 

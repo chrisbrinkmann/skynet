@@ -1,0 +1,20 @@
+@import '../../styles/global.styles';
+
+// POST CREATE
+.form {
+  display: flex;
+  flex-direction: column;
+
+  .postText {
+    width: 100%;
+    min-height: 10rem;
+    margin-bottom: 1rem;
+    font-family: $primary-font;
+    font-size: 1.4rem;
+  }
+}
+
+// ********************************** MEDIA QUERIES ********************************** //
+@media screen and (min-width: 500px) {
+
+}

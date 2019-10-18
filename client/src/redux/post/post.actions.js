@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { setAlert } from '../alert/alert.actions';
-import { ADD_POST, POST_ERROR, } from './post.types';
+import { ADD_POST, GET_POSTS, POST_ERROR, } from './post.types';
 
 const route = 'http://localhost:3000';
 
@@ -30,5 +30,24 @@ export const addPost = ({ content }) => async (dispatch) => {
       }
     });
     dispatch(setAlert('Error Creating Post', 'danger', 2000));
+  }
+};
+
+// *************************** GET ALL POSTS *************************** //
+export const getAllPosts = () => async (dispatch) => {
+  try {
+    const res = await axios.get(`${route}/posts`);
+    dispatch({
+      type: GET_POSTS,
+      payload: res.data,
+    });
+  } catch (err) {
+    dispatch({
+      type: POST_ERROR,
+      payload: {
+        msg: err.response.statusText,
+        status: err.response.status,
+      }
+    })
   }
 };

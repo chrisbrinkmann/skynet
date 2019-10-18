@@ -286,7 +286,7 @@ test('Should delete relation when pending friend request from valid user is deni
   let relation = await getRelation(decoded.id, dbUsers[0].id)
 
   // assert existing relation is pending friend request
-  expect(relation.dataValues.relationType).toEqual('pending_first_second')
+  expect(relation.relationType).toEqual('pending_first_second')
 
   // dbUsers[1] denies friend request from dbUsers[0]
   const response = await request(app)
@@ -312,7 +312,7 @@ test('Should delete relation when a friend is unfriended', async () => {
   let relation = await getRelation(decoded.id, dbUsers[4].id)
 
   // assert existing relation is 'friends'
-  expect(relation.dataValues.relationType).toEqual('friends')
+  expect(relation.relationType).toEqual('friends')
 
   // dbUsers[2] unfriends dbUsers[4]
   const response = await request(app)

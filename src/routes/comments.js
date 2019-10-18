@@ -18,17 +18,20 @@ router.post(
 
     try {
       // confirm post to comment on exists in db
-      const post = await Post.findOne({ where: { id: req.params.post_id } })
+      const post = await Post.findOne({
+        where: { id: req.params.post_id },
+        attributes: ['user_id']
+      })
 
       if (!post) {
         return res.status(404).json({ msg: 'Post not found' })
       }
 
       // confirm commenter and poster are friends
-      const friends = await areFriends(req.user.id, post.dataValues.user_id)
+      const friends = await areFriends(req.user.id, post.user_id)
 
       // only allow friends or post owner to comment
-      if (!friends && req.user.id !== post.dataValues.user_id) {
+      if (!friends && req.user.id !== post.user_id) {
         return res
           .status(401)
           .json({ msg: 'Only post owner and friends of owner can comment' })
@@ -68,7 +71,8 @@ router.delete('/:comment_id', auth, async (req, res) => {
   try {
     // confirm comment to delete exists in db
     const comment = await Comment.findOne({
-      where: { id: req.params.comment_id }
+      where: { id: req.params.comment_id },
+      attributes: ['id', 'user_id', 'post_id']
     })
 
     if (!comment) {
@@ -77,14 +81,12 @@ router.delete('/:comment_id', auth, async (req, res) => {
 
     // cache the post that the comment belongs to
     const post = await Post.findOne({
-      where: { id: comment.dataValues.post_id }
+      where: { id: comment.post_id },
+      attributes: ['user_id']
     })
 
     // confirm either comment or the post is owned by the deleter
-    if (
-      comment.dataValues.user_id !== req.user.id &&
-      post.dataValues.user_id !== req.user.id
-    ) {
+    if (comment.user_id !== req.user.id && post.user_id !== req.user.id) {
       return res
         .status(401)
         .json({ msg: 'Only post or comment owner can delete comments' })

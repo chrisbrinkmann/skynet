@@ -6,24 +6,28 @@ const auth = require('../middleware/auth')
 const { fieldValidatorChecks, populateNewsFeed } = require('../utils/utils')
 
 // create new post
-router.post('/new', [auth, fieldValidatorChecks('content')], async (req, res) => {
-  const errors = validationResult(req) // run checks on req
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() })
-  }
+router.post(
+  '/new',
+  [auth, fieldValidatorChecks('content')],
+  async (req, res) => {
+    const errors = validationResult(req) // run checks on req
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() })
+    }
 
-  try {
-    // insert post into the db
-    const post = await Post.create({
-      user_id: req.user.id,
-      content: req.body.content
-    })
+    try {
+      // insert post into the db
+      const post = await Post.create({
+        user_id: req.user.id,
+        content: req.body.content
+      })
 
-    res.status(201).json(post)
-  } catch (err) {
-    res.status(500).send('Server Error')
+      res.status(201).json(post)
+    } catch (err) {
+      res.status(500).send('Server Error')
+    }
   }
-})
+)
 
 // get all posts
 router.get('/', auth, async (req, res) => {
@@ -51,14 +55,17 @@ router.get('/newsfeed', auth, async (req, res) => {
 router.delete('/:post_id', auth, async (req, res) => {
   try {
     // confirm post to delete exists in db
-    const post = await Post.findOne({ where: { id: req.params.post_id } })
+    const post = await Post.findOne({
+      where: { id: req.params.post_id },
+      attributes: ['id', 'user_id']
+    })
 
     if (!post) {
       return res.status(404).json({ msg: 'Post not found' })
     }
 
     // confirm deleter owns the post to delete
-    if (req.user.id !== post.dataValues.user_id) {
+    if (req.user.id !== post.user_id) {
       return res.status(401).json({ msg: 'Cannot delete another users post' })
     }
 

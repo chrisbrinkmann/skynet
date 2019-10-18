@@ -3,14 +3,15 @@ const router = express.Router()
 const Relation = require('../models/Relation')
 const User = require('../models/User')
 const auth = require('../middleware/auth')
-const { formatPendingRelation, getRelation, getFriendRelations, populateFriendsList } = require('../utils/utils')
+const { formatPendingRelation, getRelation, populateFriendsList } = require('../utils/utils')
 
 // send friend request
 router.post('/request/:friend_id', auth, async (req, res) => {
   try {
     // confirm requested friend exists in db
     const friend = await User.findOne({
-      where: { id: req.params.friend_id }
+      where: { id: req.params.friend_id },
+      attributes: ['id']
     })
 
     if (!friend) {
@@ -35,7 +36,7 @@ router.post('/request/:friend_id', auth, async (req, res) => {
       where: {
         first_user_id: relationData.first_user_id,
         second_user_id: relationData.second_user_id
-      }
+      }, attributes: ['first_user_id', 'second_user_id']
     })
 
     if (existingRelation) {
@@ -72,11 +73,8 @@ router.get('/', auth, async (req, res) => {
 // get friends list
 router.get('/friends-list', auth, async (req, res) => {
   try {
-    // query db for all friend relations with req user
-    const friendRelations = await getFriendRelations(req.user.id)
-
     // populate friends list with friend id, name, and avatar
-    const friendsList = await populateFriendsList(friendRelations, req.user.id)
+    const friendsList = await populateFriendsList(req.user.id)
 
     res.status(200).json(friendsList)
   } catch (err) {
@@ -89,7 +87,8 @@ router.patch('/accept/:friend_id', auth, async (req, res) => {
   try {
     // confirm friend to accept request from exists in db
     const friend = await User.findOne({
-      where: { id: req.params.friend_id }
+      where: { id: req.params.friend_id },
+      attributes: ['id']
     })
 
     if (!friend) {
@@ -106,7 +105,8 @@ router.patch('/accept/:friend_id', auth, async (req, res) => {
 
     // confirm pending friend requests relation exists between the two users
     let relation = await Relation.findOne({
-      where: relationData
+      where: relationData,
+      attributes: ['first_user_id', 'second_user_id']
     })
 
     if (!relation) {
@@ -134,7 +134,8 @@ router.delete('/:friend_id', auth, async (req, res) => {
   try {
     // confirm friend to remove relation to exists in db
     const friend = await User.findOne({
-      where: { id: req.params.friend_id }
+      where: { id: req.params.friend_id },
+      attributes: ['id']
     })
 
     if (!friend) {

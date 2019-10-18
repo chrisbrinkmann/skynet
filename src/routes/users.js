@@ -29,7 +29,7 @@ router.post('/register', registerValidatorChecks(), async (req, res) => {
 
   try {
     // check for existing users with req email
-    let user = await User.findOne({ where: { email } })
+    let user = await User.findOne({ where: { email }, attributes: ['id'] })
 
     if (user) {
       return res.status(400).json({
@@ -44,9 +44,15 @@ router.post('/register', registerValidatorChecks(), async (req, res) => {
     // insert user to db
     user = await createUser(name, email, password, avatar)
 
-    const token = createAuthToken(user.dataValues)
+    // cache user id as token payload
+    const payload = {
+      id: user.id
+    }
 
-    res.status(201).json({ token }) // send token res
+    // create the auth token using the payload
+    const token = createAuthToken(payload)
+
+    res.status(201).json({ token })
   } catch (err) {
     res.status(400).send(err)
   }
@@ -63,7 +69,10 @@ router.post('/login', loginValidatorChecks(), async (req, res) => {
 
   try {
     // check for existing user with req email
-    let user = await User.findOne({ where: { email } })
+    let user = await User.findOne({
+      where: { email },
+      attributes: ['id', 'password']
+    })
 
     if (!user) {
       return res.status(400).json({
@@ -80,9 +89,15 @@ router.post('/login', loginValidatorChecks(), async (req, res) => {
       })
     }
 
-    const token = createAuthToken(user.dataValues)
+    // cache user id as token payload
+    const payload = {
+      id: user.id
+    }
 
-    res.status(200).json({ token }) // send token res
+    // create the auth token using the payload
+    const token = createAuthToken(payload)
+
+    res.status(200).json({ token })
   } catch (err) {
     res.status(400).send(err)
   }
@@ -114,20 +129,17 @@ router.get('/profile/:user_id', auth, async (req, res) => {
 
     // create profile object to return to client
     let profile = {
-      id: user.dataValues.id,
-      name: user.dataValues.name,
-      avatar: user.dataValues.avatar
+      id: user.id,
+      name: user.name,
+      avatar: user.avatar
     }
 
     // if req user is getting own or friends profile,
     // include the requested users bio, #friends, and posts
-    if (
-      req.user.id === user.dataValues.id ||
-      (await areFriends(req.user.id, user.dataValues.id))
-    ) {
-      profile.bio = user.dataValues.bio
-      profile.num_friends = await getFriendsCount(user.dataValues.id)
-      profile.posts = await populateUserPosts(user.dataValues.id)
+    if (req.user.id === user.id || (await areFriends(req.user.id, user.id))) {
+      profile.bio = user.bio
+      profile.num_friends = await getFriendsCount(user.id)
+      profile.posts = await populateUserPosts(user.id)
     }
 
     res.status(200).json(profile)
@@ -156,7 +168,7 @@ router.patch(
       // query db for req user
       let user = await User.findOne({
         where: { id: req.user.id },
-        attributes: { exclude: ['password'] }
+        attributes: ['id']
       })
 
       // update user name; insert to db
@@ -184,7 +196,7 @@ router.patch('/bio', [auth, fieldValidatorChecks('bio')], async (req, res) => {
     // query db for req user
     let user = await User.findOne({
       where: { id: req.user.id },
-      attributes: { exclude: ['password'] }
+      attributes: ['id']
     })
 
     // update user bio; insert to db
@@ -211,7 +223,7 @@ router.patch('/email', [auth, emailValidatorChecks()], async (req, res) => {
     // query db for req user
     let user = await User.findOne({
       where: { id: req.user.id },
-      attributes: { exclude: ['password'] }
+      attributes: ['id']
     })
 
     // update user email, avater; insert to db
@@ -227,40 +239,47 @@ router.patch('/email', [auth, emailValidatorChecks()], async (req, res) => {
 })
 
 // update user password
-router.patch('/password', [auth, passwordValidatorChecks()], async (req, res) => {
-  const errors = validationResult(req) // run checks on req
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() })
+router.patch(
+  '/password',
+  [auth, passwordValidatorChecks()],
+  async (req, res) => {
+    const errors = validationResult(req) // run checks on req
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() })
+    }
+
+    let { password } = req.body // cache req data
+
+    try {
+      // query db for req user
+      let user = await User.findOne({
+        where: { id: req.user.id },
+        attributes: ['id']
+      })
+
+      // encrypt the new password
+      password = await bcrypt.hash(password, 8)
+
+      // update the user password, insert to db
+      user = await user.update({
+        password
+      })
+
+      res.status(200).json({ msg: `Your password has been updated` })
+    } catch (err) {
+      res.status(500).send('Server Error')
+    }
   }
-
-  let { password } = req.body // cache req data
-
-  try {
-    // query db for req user
-    let user = await User.findOne({
-      where: { id: req.user.id },
-      attributes: { exclude: ['password'] }
-    })
-
-    // encrypt the new password
-    password = await bcrypt.hash(password, 8)
-
-    // update the user password, insert to db
-    user = await user.update({
-      password
-    })
-
-    res.status(200).json({ msg: `Your password has been updated` })
-  } catch (err) {
-    res.status(500).send('Server Error')
-  }
-})
+)
 
 // delete account
 router.delete('/me', auth, async (req, res) => {
   try {
     // query db for req user
-    const user = await User.findOne({ where: { id: req.user.id } })
+    const user = await User.findOne({
+      where: { id: req.user.id },
+      attributes: ['id']
+    })
 
     // delete user from db
     await user.destroy()

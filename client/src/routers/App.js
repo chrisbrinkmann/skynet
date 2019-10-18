@@ -1,5 +1,8 @@
-import React, { } from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
+
+import { store } from '../redux/store';
+import { loadUser } from '../redux/auth/auth.actions';
 
 import Navbar from '../pages/navbar/Navbar';
 import LandingPage from '../pages/LandingPage';
@@ -13,6 +16,10 @@ import PrivateRoute from '../components-page/private-route/PrivateRoute';
 
 // *************************** APP ROUTER *************************** //
 const App = () => {
+  useEffect(() => {
+    store.dispatch(loadUser());
+  }, []);
+
   return (
     <BrowserRouter>
       <Navbar />

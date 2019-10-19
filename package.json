@@ -6,8 +6,10 @@
   "scripts": {
     "bootstrap": "npm i",
     "setup": "psql -U postgres -f ./config/dbSetup.sql",
+    "start": "node src/server.js",
     "server": "nodemon -r dotenv/config src/server.js dotenv_config_path=./config/.env.local",
-    "test": "jest --watch --i --verbose"
+    "test": "jest --watch --i --verbose",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm i --prefix client && npm run build --prefix client"
   },
   "jest": {
     "setupFiles": [

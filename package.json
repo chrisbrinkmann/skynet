@@ -6,6 +6,7 @@
   "scripts": {
     "bootstrap": "npm i",
     "setup": "psql -U postgres -f ./config/dbSetup.sql",
+    "start": "node src/server.js",
     "server": "nodemon -r dotenv/config src/server.js dotenv_config_path=./config/.env.local",
     "test": "jest --watch --i --verbose"
   },

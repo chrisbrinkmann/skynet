@@ -1,10 +1,10 @@
 const Sequelize = require('sequelize')
 
-let useSSL = true
+let useSSL = false
 
-// set use SSL to false if NODE_ENV is development or test
-if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
-  useSSL = false
+// set use SSL to true if in production
+if (process.env.NODE_ENV === 'production') {
+  useSSL = true
 }
 
 // connect to db

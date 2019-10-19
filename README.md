@@ -63,7 +63,7 @@ You will need to setup your own local environment variables. To do this:
 
 - Create a new file named `.env.local` in the config directory.
 - Copy the contents of the `.env` file into `.env.local`.
-- Add your Postgres username and password
+- Add your Postgres username and password to the DATABASE_URL var
 - If needed, adjust any other variables for your local environment.
 
 ### Starting the Server:
@@ -107,8 +107,8 @@ First you will need to setup environment varibales for testing. To do this:
 
 - Create a new file named `.env.test` in the config directory
 - Copy the contents of the `.env` file into `.env.test`
-- Change the value of variable `DB_NAME` from `skynet` to `skynet-test`
-- Add your Postgres username and password
+- Add your Postgres username and password to the `DATABASE_URL` var
+- Change `skynet` to `skynet-test` in the `DATABASE_URL` var
 - If needed, adjust any other variables for your testing environment
 
 #### Test Database Setup

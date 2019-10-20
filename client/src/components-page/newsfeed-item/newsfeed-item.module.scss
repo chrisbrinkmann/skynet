@@ -1,0 +1,58 @@
+@import '../../styles/global.styles';
+
+// POST ITEM
+.newsfeedItem {
+  display: flex;
+  flex-direction: column;
+  // border: 1px solid $lightgrey;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: lighten($lightgrey, 8%);
+
+  // USER CONTAINER
+  .userContainer {
+    display: flex;
+
+    .avatar {
+      max-height: 10rem;
+    }
+
+    .postedBy {
+      margin-top: auto;
+      margin-bottom: 0;
+      margin-left: 1rem;
+
+      .profileLink {
+        color: $link;
+        font-weight: bold;
+      }
+    }
+  }
+
+  // CONTENT CONTAINER
+  .contentContainer {
+    .content {
+
+    }
+
+    .commentsLink {
+      color: $link;
+      margin-bottom: 1rem;
+      margin-left: auto;
+    }
+  }
+
+  button {
+    margin-top: 1rem;
+  }
+}
+
+// ********************************** MEDIA QUERIES ********************************** //
+@media screen and (min-width: 500px) {
+
+}
+
+// 800px MEDIA QUERY
+@media screen and (min-width: 800px) {
+
+}

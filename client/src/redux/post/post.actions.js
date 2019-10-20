@@ -42,7 +42,7 @@ export const deletePost = (postId) => async (dispatch) => {
         type: DELETE_POST,
         payload: res.data,
       });
-      dispatch(setAlert('Post Successfully Delete', 'success', 2000));
+      dispatch(setAlert('Post Successfully Deleted', 'success', 2000));
     }
   } catch (err) {
     dispatch({

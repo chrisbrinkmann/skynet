@@ -5,16 +5,16 @@ import {
   REGISTRATION_SUCCESS, REGISTRATION_FAIL, LOGIN_SUCCESS, LOGIN_FAIL, LOGOUT_USER, AUTH_ERROR, USER_LOADED 
 } from './auth.types';
 
+const route = 'http://localhost:3000';
+
 // *************************** LOAD USER *************************** //
 export const loadUser = (token) => async (dispatch) => {
   if (localStorage.token) {
     setAuthToken(localStorage.token);
   };
 
-  const route = 'http://localhost:3000';
-
   try {
-    const res = await axios.get(`${route}/users`);
+    const res = await axios.get(`${route}/users/current`);
     dispatch({
       type: USER_LOADED,
       payload: res.data,
@@ -35,8 +35,6 @@ export const registerUser = ({ name, email, password }) => async (dispatch) => {
   };
 
   const body = JSON.stringify({ name, email, password });
-
-  const route = 'http://localhost:3000';
 
   try {
     const res = await axios.post(`${route}/users/register`, body, config);
@@ -67,8 +65,6 @@ export const loginUser = (email, password) => async (dispatch) => {
   };
 
   const body = JSON.stringify({ email, password });
-
-  const route = 'http://localhost:3000';
 
   try {
     const res = await axios.post(`${route}/users/login`, body, config);

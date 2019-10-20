@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { setAlert } from '../alert/alert.actions';
-import { ADD_POST, GET_POSTS, POST_ERROR, } from './post.types';
+import { ADD_POST, DELETE_POST, GET_POSTS, POST_ERROR, } from './post.types';
 
 const route = 'http://localhost:3000';
 
@@ -30,6 +30,28 @@ export const addPost = ({ content }) => async (dispatch) => {
       }
     });
     dispatch(setAlert('Error Creating Post', 'danger', 2000));
+  }
+};
+
+// *************************** DELETE POST *************************** //
+export const deletePost = (postId) => async (dispatch) => {
+  try {
+    if (window.confirm('Please confirm you want to delete this post. This action cannot be undone.')) {
+      const res = await axios.delete(`${route}/posts/${postId}`);
+      dispatch({
+        type: DELETE_POST,
+        payload: res.data,
+      });
+      dispatch(setAlert('Post Successfully Delete', 'success', 2000));
+    }
+  } catch (err) {
+    dispatch({
+      type: POST_ERROR,
+      payload: {
+        msg: err.response.statusText,
+        status: err.response.status,
+      }
+    });
   }
 };
 

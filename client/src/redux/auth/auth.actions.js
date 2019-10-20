@@ -14,7 +14,7 @@ export const loadUser = (token) => async (dispatch) => {
   const route = 'http://localhost:3000';
 
   try {
-    const res = await axios.get(`${route}/users`);
+    const res = await axios.get(`${route}/users/current`);
     dispatch({
       type: USER_LOADED,
       payload: res.data,

@@ -114,6 +114,20 @@ router.get('/', auth, async (req, res) => {
   }
 })
 
+// get current user
+router.get('/current', auth, async (req, res) => {
+  try {
+    // query db for req user
+    let user = await User.findOne({
+      where: { id: req.user.id },
+      attributes: ['id', 'name', 'avatar', 'bio']
+    })
+    res.json(user);
+  } catch (err) {
+    res.status(500).send('Server Error');
+  }
+})
+
 // get user profile
 router.get('/profile/:user_id', auth, async (req, res) => {
   try {

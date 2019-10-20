@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { setAlert } from '../alert/alert.actions';
-import { ADD_POST, DELETE_POST, GET_POSTS, POST_ERROR, } from './post.types';
+import { ADD_POST, DELETE_POST, GET_NEWSFEED, GET_POSTS, POST_ERROR, } from './post.types';
 
 const route = 'http://localhost:3000';
 
@@ -55,6 +55,25 @@ export const deletePost = (postId) => async (dispatch) => {
       dispatch(setAlert('Error deleting post', 'danger', 2000));
     };
   };
+};
+
+// *************************** GET NEWSFEED *************************** //
+export const getNewsfeed = () => async (dispatch) => {
+  try {
+    const res = await axios.get(`${route}/posts/newsfeed`);
+    dispatch({
+      type: GET_NEWSFEED,
+      payload: res.data,
+    });
+  } catch (err) {
+    dispatch({
+      type: POST_ERROR,
+      payload: {
+        msg: err.response.statusText,
+        status: err.response.status,
+      }
+    })
+  }
 };
 
 // *************************** GET ALL POSTS *************************** //

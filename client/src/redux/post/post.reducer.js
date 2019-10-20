@@ -1,7 +1,8 @@
-import { ADD_POST, DELETE_POST, GET_POSTS, POST_ERROR } from './post.types';
+import { ADD_POST, DELETE_POST, GET_NEWSFEED, GET_POSTS, POST_ERROR } from './post.types';
 
 const INITIAL_STATE = {
   posts: [],
+  newsfeed: [],
   post: null,
   loading: true,
   error: {},
@@ -13,6 +14,7 @@ export const postReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         posts: [action.payload, ...state.posts],
+        newsfeed: [action.payload, ...state.newsfeed],
         loading: false,
         error: {},
       };
@@ -20,6 +22,13 @@ export const postReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         posts: state.posts.filter(post => post.id !== action.payload),
+        newsfeed: state.newsfeed.filter(item => item.id !== action.payload),
+        loading: false,
+      };
+    case GET_NEWSFEED :
+      return {
+        ...state,
+        newsfeed: action.payload,
         loading: false,
       };
     case GET_POSTS :

@@ -11,14 +11,14 @@ import style from './posts.module.scss';
 const Posts = ({ posts, loading, getAllPosts }) => {
   useEffect(() => {
     getAllPosts();
-  }, []);
+  }, [getAllPosts]);
 
   return (
     <div className={style.posts}>
 
       {
         posts.map(post => (
-          <PostItem post={post} />
+          <PostItem key={post.id} post={post} />
         ))
       }
 

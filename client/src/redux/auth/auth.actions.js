@@ -5,7 +5,7 @@ import {
   REGISTRATION_SUCCESS, REGISTRATION_FAIL, LOGIN_SUCCESS, LOGIN_FAIL, LOGOUT_USER, AUTH_ERROR, USER_LOADED 
 } from './auth.types';
 
-const route = 'http://localhost:3000';
+const route = process.env.REACT_APP_API_URL;
 
 // *************************** LOAD USER *************************** //
 export const loadUser = (token) => async (dispatch) => {
@@ -33,6 +33,8 @@ export const registerUser = ({ name, email, password }) => async (dispatch) => {
       'Content-Type': 'application/json'
     }
   };
+
+  console.log(process.env.REACT_APP_API_URL)
 
   const body = JSON.stringify({ name, email, password });
 

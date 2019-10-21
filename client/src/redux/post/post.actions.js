@@ -2,7 +2,7 @@ import axios from 'axios';
 import { setAlert } from '../alert/alert.actions';
 import { ADD_POST, DELETE_POST, GET_NEWSFEED, GET_POSTS, POST_ERROR, } from './post.types';
 
-const route = 'http://localhost:3000';
+const route = process.env.REACT_APP_API_URL;
 
 // *************************** ADD POST *************************** //
 export const addPost = ({ content }) => async (dispatch) => {

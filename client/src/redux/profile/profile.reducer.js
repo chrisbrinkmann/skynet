@@ -1,3 +1,4 @@
+import { GET_PROFILE, PROFILE_ERROR } from './profile.types';
 
 const INITIAL_STATE = {
   currentProfile: null,
@@ -7,7 +8,19 @@ const INITIAL_STATE = {
 
 export const profileReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
-    default :
+    case GET_PROFILE :
+      return {
+        ...state,
+        currentProfile: action.payload,
+        loading: false,
+      };
+    case PROFILE_ERROR :
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+      };
+    default : 
       return state;
-  };
+  }
 };

@@ -17,13 +17,17 @@ const Profile = ({ currentProfile, loading, auth, match, getUserProfile }) => {
     getUserProfile(match.params.id);
   }, [getUserProfile, match]);
 
-  return (
-    <div className={style.profile}>
-    {
-      currentProfile === null || loading
-      ? <Spinner />
-      : <div className={style.profileContainer}>
-
+  if (currentProfile === null || loading) {
+    return (
+      <div className={style.profile}>
+        <Spinner />
+      </div>
+    )
+  } else {
+    return (
+      <div className={style.profile}>
+        <div className={style.profileContainer}>
+  
           <div className={style.profileHeader}>
             <h2 className={style.name}>{currentProfile.name}'s Profile</h2>
             <p className={style.friends}>Friends ({currentProfile.num_friends})</p>
@@ -33,7 +37,7 @@ const Profile = ({ currentProfile, loading, auth, match, getUserProfile }) => {
               : <Button success>Friend Request</Button>
             }
           </div>
-
+  
           <div className={style.profileContent}>
             <img src={currentProfile.avatar} alt={currentProfile.name} className={style.avatar} />
             <div className={style.bioContainer}>
@@ -41,7 +45,7 @@ const Profile = ({ currentProfile, loading, auth, match, getUserProfile }) => {
               <p className={style.bio}>{currentProfile.bio ? currentProfile.bio : 'No info'}</p>
             </div>
           </div>
-
+  
           <div className={style.postsContainer}>
             <h3 className={style.postsHeader}>Recent Posts</h3>
             <div>
@@ -58,16 +62,16 @@ const Profile = ({ currentProfile, loading, auth, match, getUserProfile }) => {
               ))}
             </div>
           </div>
-
+  
           <div className={style.linksContainer}>
             <Link to='/newsfeed' className={style.link}>
               Back To Newsfeed <FaCaretRight className={style.linkIcon} />
             </Link>
           </div>
         </div>
-    }
-    </div>
-  )
+      </div>
+    )
+  }
 };
 
 // REDUX

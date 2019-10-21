@@ -9,14 +9,21 @@ import SignIn from '../../components-page/sign-in/SignIn';
 import style from './navbar.module.scss';
 
 // *************************** NAVBAR COMPONENT *************************** //
-const Navbar = ({ isAuthenticated, logoutUser }) => {
+const Navbar = ({ isAuthenticated, logoutUser, user }) => {
+  
+  let userId = ''
+
+  if (user !== null) {
+    userId = user.id
+  }
+  
   const authLinks = (
     <ul className={style.links}>
       <li>
         <NavLink to='/friends' className={style.link} activeClassName={style.active}>Friends</NavLink>
       </li>
       <li>
-        <NavLink to='/profile/:id' className={style.link} activeClassName={style.active}>Profile</NavLink>
+        <NavLink to={`/profile/${userId}`} className={style.link} activeClassName={style.active}>Profile</NavLink>
       </li>
       <span onClick={(e) => logoutUser(e)} className={style.link}>Logout</span>
     </ul>
@@ -43,10 +50,11 @@ const Navbar = ({ isAuthenticated, logoutUser }) => {
 // REDUX
 const mapStateToProps = (state) => ({
   isAuthenticated: state.auth.isAuthenticated,
+  user: state.auth.user
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  logoutUser: () => dispatch(logoutUser()),
+  logoutUser: () => dispatch(logoutUser())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Navbar);

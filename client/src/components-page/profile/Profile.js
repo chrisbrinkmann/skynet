@@ -11,7 +11,7 @@ import Button from '../../components-ui/button/Button';
 import style from './profile.module.scss';
 
 // *************************** PROFILE COMPONENT *************************** //
-const Profile = ({ currentProfile, loading, auth, match, getUserProfile }) => {
+const Profile = ({ currentProfile, loading, auth, match, history, getUserProfile }) => {
   // 'match' passed down as prop from AppRouter
   useEffect(() => {
     getUserProfile(match.params.id);
@@ -33,8 +33,8 @@ const Profile = ({ currentProfile, loading, auth, match, getUserProfile }) => {
             <p className={style.friends}>Friends ({currentProfile.num_friends})</p>
             {
               auth.user.id === currentProfile.id 
-              ? <Button warning>Edit Profile</Button>
-              : <Button success>Friend Request</Button>
+                ? <Button warning onClick={() => history.push('/profile/edit')}>Edit Profile</Button>
+                : <Button success>Friend Request</Button>
             }
           </div>
   

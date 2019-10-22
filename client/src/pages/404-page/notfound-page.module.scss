@@ -1,9 +1,25 @@
 @import '../../styles/global.styles';
 
+// SUB CONTAINER
+.subContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+// ARNOLD
+.skull {
+  width: 33%;
+  height: auto;
+  display: block;
+}
+
 // TITLE
 .title {
   color: $black;
   margin-right: 1rem;
+  display: inline;
 }
 
 // BREAK
@@ -20,9 +36,9 @@
   color: grey;
   font-size: 1.6rem;
   font-weight: lighter;
+  display: inline;
 }
 
 // ********************************** MEDIA QUERIES ********************************** //
 @media screen and (min-width: 500px) {
-  
 }

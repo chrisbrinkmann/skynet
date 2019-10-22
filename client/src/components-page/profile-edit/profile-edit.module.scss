@@ -3,12 +3,62 @@
 // PAGE CONTAINER
 .profileEdit {
 
+  // FORM
+  .form {
+    margin-bottom: 1rem;
+
+    .header {
+      font-weight: bold;
+    }
+
+    .bio {
+      width: 100%;
+      height: 10rem;
+      margin-bottom: 1rem;
+      color: $black;
+      padding: 1rem;
+    }
+  }
+
+    // LINKS SECTION
+    .linksContainer {
+      margin-top: 2.5rem;
+      text-align: center;
+      width: 60%;
+      margin-left: auto;
+      margin-right: auto;
+      
+      cursor: pointer;
+    
+      .link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: $link;
+        text-decoration: underline;
+        font-size: 1.4rem;
+    
+        .linkIcon {
+          padding-top: 2.5px;
+          font-size: 1.4rem;
+        }
+      }
+    }
 }
 
 // ********************************** MEDIA QUERIES ********************************** //
 @media screen and (min-width: 500px) {
   .profileEdit {
+    // FORM
+    .form {
+      .header {
+        
+      }
 
+      .bio {
+        width: 50%;
+      }
+    }
   }
 }
 

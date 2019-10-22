@@ -12,9 +12,20 @@
 
   padding: 1rem;
 
-  .logo {
-    text-transform: uppercase;
-    color: $primary-color;
+  .logoContainer {
+    display: flex;
+    align-items: center;
+
+    .logoImg {
+      height: 3rem;
+      width: auto;
+    }
+
+    .logo {
+      font-family: $terminator-font;
+      text-transform: uppercase;
+      color: $primary-color;
+    }
   }
 
   .guestLinks {
@@ -35,7 +46,6 @@
     }
 
     .active {
-
     }
   }
 }
@@ -43,7 +53,6 @@
 // ********************************** MEDIA QUERIES ********************************** //
 @media screen and (min-width: 500px) {
   .navbar {
-
   }
 }
 

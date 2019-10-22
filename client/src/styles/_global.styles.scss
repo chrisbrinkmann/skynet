@@ -22,7 +22,15 @@ $grey: #808080;
 $lightgrey: #D3D3D3;
 
 // GLOBAL FONT VARIABLES
-$primary-font: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+@font-face {
+  font-family: 'Terminator Real NFI';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Terminator Real NFI'), url('terminator real nfi.woff') format('woff');
+}
+
+$terminator-font: 'Terminator Real NFI';
+$primary-font: Play, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
 Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 $secondary-font: 'Raleway', 'Arial', sans-serif;
 $other-font: 'Roboto', 'Arial', sans-serif;

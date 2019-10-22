@@ -33,8 +33,9 @@ const Navbar = ({ isAuthenticated, logoutUser, user }) => {
     <nav className={style.navbar}>
 
       <Fragment>
-        <Link to='/'>
-          <h1 className={style.logo}>SKY</h1>
+        <Link className={style.logoContainer}to='/'>
+          <img className={style.logoImg} src={process.env.PUBLIC_URL + 'assets/skull_toon.png'} alt='skull toon'/>
+          <h1 className={style.logo}>SKYNET</h1>
         </Link>
       </Fragment>
 

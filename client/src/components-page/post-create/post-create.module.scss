@@ -1,16 +1,27 @@
 @import '../../styles/global.styles';
 
 // POST CREATE
-.form {
-  display: flex;
-  flex-direction: column;
+.createPostContainer{
+  
 
-  .postText {
-    width: 100%;
-    min-height: 10rem;
-    margin-bottom: 1rem;
-    font-family: $primary-font;
-    font-size: 1.4rem;
+  .robotImg {
+    height:auto;
+    width: 45%;
+    display: block;
+    margin: auto;
+  }
+  
+  .form {
+    display: flex;
+    flex-direction: column;
+  
+    .postText {
+      width: 100%;
+      min-height: 10rem;
+      margin-bottom: 1rem;
+      font-family: $primary-font;
+      font-size: 1.4rem;
+    }
   }
 }
 

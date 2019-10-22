@@ -4,7 +4,6 @@
 .newsfeedItem {
   display: flex;
   flex-direction: column;
-  // border: 1px solid $lightgrey;
   margin-bottom: 1rem;
   padding: 1rem;
   background: lighten($lightgrey, 8%);
@@ -39,6 +38,15 @@
       color: $link;
       margin-bottom: 1rem;
       margin-left: auto;
+    }
+  }
+
+  // COMMENT CONTAINER
+  .commentContainer {
+    margin-bottom: 1rem;
+
+    .header {
+      font-weight: bold;
     }
   }
 

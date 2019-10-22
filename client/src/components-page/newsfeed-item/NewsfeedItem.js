@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { deletePost } from '../../redux/post/post.actions';
 import { getNewsfeed } from '../../redux/post/post.actions';
 
+import CommentCreate from '../../components-page/comment-create/CommentCreate';
 import Button from '../../components-ui/button/Button';
 
 import style from './newsfeed-item.module.scss';
@@ -29,10 +30,13 @@ const NewsfeedItem = ({ item, auth, deletePost, getNewsfeed }) => {
 
       <div className={style.contentContainer}>
         <p className={style.content}>{content}</p>
-        <Link to={`/${id}/comments`} className={style.commentsLink}>
-          Comments ({comments && comments.length > 0 ? comments.length : 0})
-        </Link>
       </div>
+
+      <div className={style.commentContainer}>
+        <p className={style.header}>Comments</p>
+      </div>
+
+      <CommentCreate />
 
       {
         auth.user.id === user_id &&

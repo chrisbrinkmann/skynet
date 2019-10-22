@@ -1,0 +1,30 @@
+@import '../../styles/global.styles';
+
+// COMMENT CREATE
+.commentCreate {
+
+  // FORM
+  .form {
+    display: flex;
+    flex-direction: column;
+    
+    .commentText {
+      padding: 1rem;
+      margin-right: 1rem;
+      width: 100%;
+      min-height: 4rem;
+      font-family: $primary-font;
+      font-size: 1.2rem;
+    }
+  }
+}
+
+// ********************************** MEDIA QUERIES ********************************** //
+@media screen and (min-width: 500px) {
+
+}
+
+// 800px MEDIA QUERY
+@media screen and (min-width: 800px) {
+
+}

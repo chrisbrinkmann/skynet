@@ -1,4 +1,4 @@
-import { ADD_POST, DELETE_POST, GET_NEWSFEED, GET_POSTS, POST_ERROR } from './post.types';
+import { ADD_POST, DELETE_POST, GET_NEWSFEED, GET_POSTS, ADD_COMMENT, DELETE_COMMENT, POST_ERROR } from './post.types';
 
 const INITIAL_STATE = {
   posts: [],
@@ -36,6 +36,15 @@ export const postReducer = (state = INITIAL_STATE, action) => {
         ...state,
         posts: action.payload,
         loading: false,
+      };
+    case ADD_COMMENT :
+    case DELETE_COMMENT :
+      return {
+        ...state,
+        post: {
+          ...state.post,
+          comments: action.payload,
+        },
       };
     case POST_ERROR :
       return {

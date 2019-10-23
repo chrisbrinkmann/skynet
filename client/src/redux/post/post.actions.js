@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { setAlert } from '../alert/alert.actions';
-import { ADD_POST, DELETE_POST, GET_NEWSFEED, GET_POSTS, POST_ERROR, } from './post.types';
+import { ADD_POST, DELETE_POST, GET_NEWSFEED, GET_POSTS, ADD_COMMENT, DELETE_COMMENT, POST_ERROR, } from './post.types';
 
 const route = process.env.REACT_APP_API_URL;
 
@@ -92,5 +92,54 @@ export const getAllPosts = () => async (dispatch) => {
         status: err.response.status,
       }
     })
+  }
+};
+
+// *************************** ADD COMMENT *************************** //
+export const addComment = (postId, formData) => async (dispatch) => {
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+
+  try {
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/comments/new/${postId}`, formData, config);
+    dispatch({
+      type: ADD_COMMENT,
+      payload: res.data,
+    });
+  } catch (err) {
+    dispatch({
+      type: POST_ERROR,
+      payload: {
+        msg: err.response.statusText,
+        status: err.response.status,
+      },
+    });
+    dispatch(setAlert('Error adding comment', 'danger', 2000));
+  };
+};
+
+// *************************** DELETE COMMENT *************************** //
+export const deleteComment = (commentId) => async (dispatch) => {
+  if (window.confirm('Please confirm you want to delete this comment. This action cannot be undone.')) {
+    try {
+      await axios.delete(`${process.env.REACT_APP_API_URL}/comments/${commentId}`);
+  
+      dispatch({
+        type: DELETE_COMMENT,
+        payload: commentId,
+      });
+    } catch (err) {
+      dispatch({
+        type: POST_ERROR,
+        payload: {
+          msg: err.response.statusText,
+          status: err.response.status,
+        }
+      });
+      dispatch(setAlert('Error deleting comment', 'danger', 2000));
+    };
   }
 };

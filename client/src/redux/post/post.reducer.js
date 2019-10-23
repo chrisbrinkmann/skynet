@@ -37,6 +37,15 @@ export const postReducer = (state = INITIAL_STATE, action) => {
         posts: action.payload,
         loading: false,
       };
+    case ADD_COMMENT :
+    case DELETE_COMMENT :
+      return {
+        ...state,
+        post: {
+          ...state.post,
+          comments: action.payload,
+        },
+      };
     case POST_ERROR :
       return {
         ...state,

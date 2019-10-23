@@ -34,11 +34,11 @@ const NewsfeedItem = ({ item, auth, deletePost, getNewsfeed }) => {
 
       <div className={style.commentContainer}>
         <p className={style.header}>Comments</p>
-          {
-            comments.map(comment => (
-              <CommentItem key={comment.id} comment={comment} />
-            ))
-          }
+        {
+          comments 
+            ? comments.map(comment => ( <CommentItem key={comment.id} comment={comment} /> ))
+            : ''
+        }
       </div>
 
       <CommentCreate postId={id} />

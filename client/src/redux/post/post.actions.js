@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { setAlert } from '../alert/alert.actions';
-import { ADD_POST, DELETE_POST, GET_NEWSFEED, GET_POSTS, ADD_COMMENT, DELETE_COMMENT, POST_ERROR, } from './post.types';
+import { ADD_POST, DELETE_POST, GET_NEWSFEED, ADD_COMMENT, DELETE_COMMENT, POST_ERROR, } from './post.types';
 
 const route = process.env.REACT_APP_API_URL;
 
@@ -63,25 +63,6 @@ export const getNewsfeed = () => async (dispatch) => {
     const res = await axios.get(`${route}/posts/newsfeed`);
     dispatch({
       type: GET_NEWSFEED,
-      payload: res.data,
-    });
-  } catch (err) {
-    dispatch({
-      type: POST_ERROR,
-      payload: {
-        msg: err.response.statusText,
-        status: err.response.status,
-      }
-    })
-  }
-};
-
-// *************************** GET ALL POSTS *************************** //
-export const getAllPosts = () => async (dispatch) => {
-  try {
-    const res = await axios.get(`${route}/posts`);
-    dispatch({
-      type: GET_POSTS,
       payload: res.data,
     });
   } catch (err) {

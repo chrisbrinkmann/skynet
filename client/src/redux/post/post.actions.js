@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { setAlert } from '../alert/alert.actions';
-import { ADD_POST, DELETE_POST, GET_NEWSFEED, GET_POSTS, POST_ERROR, } from './post.types';
+import { ADD_POST, DELETE_POST, GET_NEWSFEED, GET_POSTS, ADD_COMMENT, DELETE_COMMENT, POST_ERROR, } from './post.types';
 
 const route = process.env.REACT_APP_API_URL;
 

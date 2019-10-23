@@ -2,9 +2,9 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 
-import { deletePost } from '../../redux/post/post.actions';
-import { getNewsfeed } from '../../redux/post/post.actions';
+import { getNewsfeed, deletePost } from '../../redux/post/post.actions';
 
+import CommentItem from '../comment-item/CommentItem';
 import CommentCreate from '../../components-page/comment-create/CommentCreate';
 import Button from '../../components-ui/button/Button';
 
@@ -34,9 +34,14 @@ const NewsfeedItem = ({ item, auth, deletePost, getNewsfeed }) => {
 
       <div className={style.commentContainer}>
         <p className={style.header}>Comments</p>
+          {
+            comments.map(comment => (
+              <CommentItem key={comment.id} comment={comment} />
+            ))
+          }
       </div>
 
-      <CommentCreate />
+      <CommentCreate postId={id} />
 
       {
         auth.user.id === user_id &&

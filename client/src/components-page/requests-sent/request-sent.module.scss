@@ -1,0 +1,46 @@
+@import '../../styles/global.styles';
+
+// RELATIONS ITEM
+.requestsSent {
+
+  // RELATIONS
+  .relations {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: lighten($lightgrey, 7%);
+
+    padding: 1rem;
+
+    .avatar {
+      width: 50%;
+      border-radius: 50%;
+      background: $white;
+    }
+
+    .name {
+      text-transform: uppercase;
+      text-decoration: underline;
+      text-align: center;
+      font-size: 1.6rem;
+
+      .nameLink {
+        color: $black;
+      }
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: space-evenly;
+
+      & :first-child {
+        margin-right: 1rem;
+      }
+    }
+  }
+}
+
+// ********************************** MEDIA QUERIES ********************************** //
+@media screen and (min-width: 500px) {
+
+}

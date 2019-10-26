@@ -1,5 +1,4 @@
 import React, { } from 'react';
-import { IoIosImage, IoMdPaper, IoIosSearch } from 'react-icons/io';
 import style from './landing-text.module.scss';
 
 // *************************** LANDING TEXT COMPONENT *************************** //

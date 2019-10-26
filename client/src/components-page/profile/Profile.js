@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { FaCaretRight } from 'react-icons/fa';
 
 import { getUserProfile } from '../../redux/profile/profile.actions';
+import { getAllRelations } from '../../redux/relations/relations.actions';
 
 import Spinner from '../../components-ui/spinner/Spinner';
 import Button from '../../components-ui/button/Button';
@@ -11,11 +12,12 @@ import Button from '../../components-ui/button/Button';
 import style from './profile.module.scss';
 
 // *************************** PROFILE COMPONENT *************************** //
-const Profile = ({ currentProfile, loading, auth, match, history, getUserProfile }) => {
+const Profile = ({ currentProfile, loading, auth, match, history, getUserProfile, getAllRelations }) => {
   // 'match' passed down as prop from AppRouter
   useEffect(() => {
     getUserProfile(match.params.id);
-  }, [getUserProfile, match]);
+    getAllRelations();
+  }, [getUserProfile, match, getAllRelations]);
 
   if (currentProfile === null || loading) {
     return (
@@ -30,11 +32,11 @@ const Profile = ({ currentProfile, loading, auth, match, history, getUserProfile
   
           <div className={style.profileHeader}>
             <h2 className={style.name}>{currentProfile.name}'s Profile</h2>
-            <p className={style.friends}>Friends ({currentProfile.num_friends})</p>
+            <p className={style.friends}>Friends ({currentProfile.num_friends ? currentProfile.num_friends : 0})</p>
             {
               auth.user.id === currentProfile.id 
                 ? <Button warning onClick={() => history.push('/profile/edit')}>Edit Profile</Button>
-                : <Button success>Friend Request</Button>
+                : ''
             }
           </div>
   
@@ -48,19 +50,16 @@ const Profile = ({ currentProfile, loading, auth, match, history, getUserProfile
   
           <div className={style.postsContainer}>
             <h3 className={style.postsHeader}>Recent Posts</h3>
-            <div>
-              {currentProfile.posts
-                .filter((idx, item) => item < 5)
-                .map(post => (
-                <div key={post.id}>
-                  <h4>Post #{post.id}</h4>
-                  <p>{post.content}</p>
-                  <p>
-                    <Link to={`/${post.id}/comments`} className={style.commentsLink}>Comments ({post.comments.length})</Link>
-                  </p>
-                </div>
-              ))}
-            </div>
+              {currentProfile.posts && currentProfile.posts.length > 0
+                ? currentProfile.posts
+                  .filter((idx, item) => item < 5)
+                  .map(post => (
+                    <div key={post.id} className={style.post}>
+                      <p className={style.postContent}>{post.content}</p>
+                    </div>
+                ))
+                : <p>No posts yet, I'll be back</p>
+              }
           </div>
   
           <div className={style.linksContainer}>
@@ -79,10 +78,12 @@ const mapStateToProps = (state) => ({
   currentProfile: state.profile.currentProfile,
   loading: state.profile.loading,
   auth: state.auth,
+  allRelations: state.relations.allRelations,
 });
 
 const mapDispatchToProps = (dispatch) => ({
   getUserProfile: (userId) => dispatch(getUserProfile(userId)),
+  getAllRelations: () => dispatch(getAllRelations()),
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Profile));

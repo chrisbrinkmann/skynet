@@ -9,6 +9,7 @@ const NotFoundPage = () => {
       <div className={style.subContainer}>
         <img
           src={process.env.PUBLIC_URL + '/assets/skull.png'}
+          alt='not found skull'
           className={style.skull}
         />
         <div>

@@ -10,6 +10,7 @@ import NewsfeedPage from '../pages/NewsfeedPage';
 import FriendsPage from '../pages/FriendsPage';
 import ProfilePage from '../pages/ProfilePage';
 import ProfileEditPage from '../pages/ProfileEditPage';
+import UsersPage from '../pages/UsersPage';
 import NotFoundPage from '../pages/404-page/NotFoundPage';
 
 import Alert from '../components-page/alert/Alert';
@@ -31,6 +32,7 @@ const App = () => {
         <PrivateRoute exact path='/friends' component={FriendsPage} />
         <PrivateRoute exact path='/profile/edit' component={ProfileEditPage} />
         <PrivateRoute exact path='/profile/:id' component={ProfilePage} />
+        <PrivateRoute exact path='/users' component={UsersPage} />
         <Route component={NotFoundPage} />
       </Switch>
     </BrowserRouter>

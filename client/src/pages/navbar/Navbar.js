@@ -25,6 +25,9 @@ const Navbar = ({ isAuthenticated, logoutUser, user }) => {
       <li>
         <NavLink to={`/profile/${userId}`} className={style.link} activeClassName={style.active}>Profile</NavLink>
       </li>
+      <li>
+        <NavLink to='/users' className={style.link} activeClassName={style.active}>Users</NavLink>
+      </li>
       <span onClick={(e) => logoutUser(e)} className={style.link}>Logout</span>
     </ul>
   );

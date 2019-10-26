@@ -12,13 +12,13 @@
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      padding: 1rem;
+      padding: 2rem 0;
       margin-bottom: 1rem;
 
       background: lighten($lightgrey, 7.5%);
 
       .name {
-        margin-bottom: 0;
+        margin: 0;
       }
 
       .friends {
@@ -54,8 +54,23 @@
     .postsContainer {
       margin-bottom: 1rem;
 
-      .commentsLink {
-        color: $link;
+      .postsHeader {
+        font-size: 1.8rem;
+        text-decoration: underline;
+      }
+
+      .post {
+        background: lighten($lightgrey, 7.5%);
+        padding: 1rem;
+        margin-bottom: 1rem;
+
+        .postTitle {
+          font-weight: bold;
+        }
+
+        .postContent {
+          font-size: 1.4rem;
+        }
       }
     }
 

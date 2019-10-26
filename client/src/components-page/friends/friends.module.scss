@@ -1,0 +1,84 @@
+@import '../../styles/global.styles';
+
+// FRIENDS
+.friends {
+
+  // RELATIONS
+  .relationsContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+    grid-template-rows: auto;
+    grid-column-gap: 1rem;
+    grid-row-gap: 1rem;
+  }
+
+  // FRIENDS CONTAINER
+  .friendsContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+    grid-template-rows: auto;
+    grid-column-gap: 1rem;
+    grid-row-gap: 1rem;
+
+    .title {
+
+    }
+
+    // FRIEND
+    .friend {
+      margin-bottom: 1rem;
+      
+      .avatar {
+        width: 50%;
+        border-radius: 50%;
+      }
+    }
+  }
+
+  // USERS CONTAINER
+  .usersContainer {
+
+  }
+}
+
+// ********************************** MEDIA QUERIES ********************************** //
+@media screen and (min-width: 500px) {
+  // FRIENDS
+  .friends {
+
+    // RELATIONS
+    .relationsContainer {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+      grid-template-rows: auto;
+      grid-column-gap: 1rem;
+    }
+
+    // FRIENDS CONTAINER
+    .friendsContainer {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+      grid-template-rows: auto;
+      grid-column-gap: 1rem;
+      grid-row-gap: 1rem;
+
+      .title {
+
+      }
+
+      // FRIEND
+      .friend {
+        margin-bottom: 1rem;
+        
+        .avatar {
+
+        }
+      }
+    }
+
+    // USERS CONTAINER
+    .usersContainer {
+
+    }
+  }
+}

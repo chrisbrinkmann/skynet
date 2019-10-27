@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { setAlert } from '../alert/alert.actions';
-import { GET_RELATIONS, GET_FRIENDS, GET_USERS, SEND_REQUEST, ACCEPT_REQUEST, DECLINE_UNFRIEND, RELATIONS_ERROR } from './relations.types';
+import { GET_RELATIONS, GET_FRIENDS, GET_USERS, SEND_REQUEST, ACCEPT_REQUEST, DECLINE_UNFRIEND, SEARCH_USERS, RELATIONS_ERROR } from './relations.types';
 
 // *************************** GET RELATIONS *************************** //
 export const getAllRelations = () => async (dispatch) => {
@@ -121,5 +121,17 @@ export const declineOrUnfriend = (friendId) => async (dispatch) => {
       });
       dispatch(setAlert('Error with decline / unfriend, please try again', 'danger', 2000));
     };
+  };
+};
+
+// *************************** SEARCH USERS *************************** //
+export const setSearchField = (text) => (dispatch) => {
+  try {
+    dispatch({
+      type: SEARCH_USERS,
+      payload: text,
+    });
+  } catch (err) {
+    console.error(err)
   };
 };

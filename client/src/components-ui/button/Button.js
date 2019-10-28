@@ -2,7 +2,7 @@ import React, { } from 'react';
 import style from './button.module.scss';
 
 // *************************** BUTTON COMPONENT *************************** //
-const Button = ({ small, medium, inverted, success, danger, warning, children, ...otherProps }) => {
+const Button = ({ small, medium, inverted, success, danger, link, warning, children, ...otherProps }) => {
   // destructured props will be passed down via parent component (determines size / color / children / otherProps)
   // size and color variables can be chained together
   return (
@@ -14,6 +14,7 @@ const Button = ({ small, medium, inverted, success, danger, warning, children, .
         ${success ? style.success : ''}
         ${danger ? style.danger : ''}
         ${warning ? style.warning : ''}
+        ${link ? style.link : ''}
         ${style.button}
       `}
       {...otherProps}

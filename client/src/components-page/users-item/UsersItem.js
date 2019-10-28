@@ -2,25 +2,45 @@ import React, { } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 
-import { getAllFriends, getAllRelations, sendFriendRequest, declineOrUnfriend } from '../../redux/relations/relations.actions';
+import { getAllRelations, sendFriendRequest } from '../../redux/relations/relations.actions';
  
 import Button from '../../components-ui/button/Button';
 
 import style from './users-item.module.scss';
 
 // *************************** USER ITEM COMPONENT *************************** //
-const UsersItem = ({ user, auth, getAllRelations, getAllFriends, sendFriendRequest, declineOrUnfriend }) => {
+const UsersItem = ({ user, auth, allRelations, getAllRelations, sendFriendRequest, friendsList }) => {
   // 'user' passed down as prop from Users.js component
   const { id, name, avatar } = user;
 
+  const areFriends = () => {
+    const friendIds = friendsList.map(friend => {
+      return friend.id
+    })
+
+    return friendIds.includes(id)
+  }
+
+  const arePending = () => {
+    const pendingRelations = allRelations.filter(rel => rel.relationType !== 'friends')
+
+    return pendingRelations.find(rel => {
+      let result = false
+      
+      if (rel.first_user_id === auth.user.id && rel.second_user_id === id) {
+        result = true
+      }
+
+      if (rel.second_user_id === auth.user.id && rel.first_user_id === id) {
+        result = true
+      }
+
+      return result
+    })
+  }
+
   const onFriendRequest = async () => {
     await sendFriendRequest(id);
-    await getAllRelations();
-  };
-
-  const onDeclineOrUnfriend = async () => {
-    await declineOrUnfriend(id);
-    await getAllFriends();
     await getAllRelations();
   };
 
@@ -35,9 +55,12 @@ const UsersItem = ({ user, auth, getAllRelations, getAllFriends, sendFriendReque
                 {name}
               </Link>
             </p>
-            <div className={style.buttons}>
-              <Button onClick={() => onFriendRequest(id)} warning medium>Add Friend</Button>
-              <Button onClick={() => onDeclineOrUnfriend(id)} warning medium>Unfriend</Button>
+          <div className={style.buttons}>
+            {
+              areFriends() ? <Button success medium>Friends</Button>
+                : arePending() ? <Button warning medium>Pending</Button>
+                  : <Button onClick={() => onFriendRequest(id)} link medium>Add Friend</Button>
+            }
             </div>
           </div>
       }
@@ -49,15 +72,12 @@ const UsersItem = ({ user, auth, getAllRelations, getAllFriends, sendFriendReque
 const mapStateToProps = (state) => ({
   auth: state.auth,
   friendsList: state.relations.friendsList,
-  relationships: state.relations.relationships,
   allRelations: state.relations.allRelations,
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  getAllFriends: () => dispatch(getAllFriends()),
   getAllRelations: () => dispatch(getAllRelations()),
   sendFriendRequest: (friendId) => dispatch(sendFriendRequest(friendId)),
-  declineOrUnfriend: (friendId) => dispatch(declineOrUnfriend(friendId)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(UsersItem);

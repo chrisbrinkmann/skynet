@@ -56,7 +56,8 @@
     border: none;
 
     &:hover {
-      background: lighten($success, 7%);
+      // background: lighten($success, 7%);
+      cursor: inherit;
     }
   }
 
@@ -79,6 +80,17 @@
 
     &:hover {
       background: lighten($warning, 7%);
+    }
+  }
+
+  // LINK
+  &.link {
+    background: $link;
+    color: $white;
+    border: none;
+
+    &:hover {
+      background: lighten($link, 7%);
     }
   }
 }

@@ -9,7 +9,7 @@ A social network that will take over the world.
 - [Testing](#testing)
 
 ## About
-This app will implement the basic features of a modern social network site. Users can register and login with a valid email address. Once logged in, users can: maintain a profile page (picture, bio), build a network of 'friends' with other users, create public posts, and view/comment on posts of their friends.
+This app implements the basic features of a modern social network site. Users can register and login with a valid email address. Once logged in, users can: maintain a profile page (picture, bio), build a network of 'friends' with other users, create public posts, and view/comment on posts of their friends.
 
 ## Technologies
 - React - version 16.9
@@ -19,7 +19,7 @@ This app will implement the basic features of a modern social network site. User
 - PostgreSQL - version 11.5
 
 ## Demo
-A live working demo will be deployed to Heroku.
+A live working demo is deployed on Heroku: [Skynet](https://skynet-app-1.herokuapp.com/)
 
 ## Development Setup
 To clone and build this application, you'll need [Git](https://git-scm.com), [Node.js](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)), and [PostgreSQL](https://www.postgresql.org/download/) installed on your computer.

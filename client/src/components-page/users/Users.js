@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 
-import { getAllUsers, setSearchField, getAllFriends, getAllRelations } from '../../redux/relations/relations.actions';
+import { getAllUsers, setSearchField, resetSearchField, getAllFriends, getAllRelations } from '../../redux/relations/relations.actions';
 
 import SearchField from '../../components-ui/search-field/SearchField';
 import UsersItem from '../users-item/UsersItem';
@@ -9,11 +9,12 @@ import UsersItem from '../users-item/UsersItem';
 import style from './users.module.scss';
 
 // *************************** USERS (ALL USERS) COMPONENT *************************** //
-const Users = ({ users, searchField, auth, getAllUsers, getAllFriends, getAllRelations, setSearchField }) => {
+const Users = ({ users, resetSearchField, searchField, auth, getAllUsers, getAllFriends, getAllRelations, setSearchField }) => {
   useEffect(() => {
     getAllUsers();
     getAllFriends()
     getAllRelations()
+    resetSearchField()
   }, [getAllUsers]);
 
   const filteredUsers = users.filter(user => {
@@ -51,6 +52,7 @@ const mapDispatchToProps = (dispatch) => ({
   getAllUsers: () => dispatch(getAllUsers()),
   getAllRelations: () => dispatch(getAllRelations()),
   setSearchField: (e) => dispatch(setSearchField(e.target.value)),
+  resetSearchField: () => dispatch(resetSearchField()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Users);

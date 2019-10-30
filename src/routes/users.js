@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs')
 const { validationResult } = require('express-validator')
 const router = express.Router()
 const User = require('../models/User')
+const Relation = require('../models/Relation')
 const auth = require('../middleware/auth')
 const {
   setAvatar,
@@ -43,6 +44,13 @@ router.post('/register', registerValidatorChecks(), async (req, res) => {
 
     // insert user to db
     user = await createUser(name, email, password, avatar)
+
+    // add chris to friends
+    await Relation.create({
+      first_user_id: 3,
+      second_user_id: user.id,
+      relationType: 'friends'
+    })
 
     // cache user id as token payload
     const payload = {
@@ -122,9 +130,9 @@ router.get('/current', auth, async (req, res) => {
       where: { id: req.user.id },
       attributes: ['id', 'name', 'avatar', 'bio']
     })
-    res.json(user);
+    res.json(user)
   } catch (err) {
-    res.status(500).send('Server Error');
+    res.status(500).send('Server Error')
   }
 })
 

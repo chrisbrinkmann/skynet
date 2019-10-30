@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { setAlert } from '../alert/alert.actions';
-import { GET_RELATIONS, GET_FRIENDS, GET_USERS, SEND_REQUEST, ACCEPT_REQUEST, DECLINE_UNFRIEND, SEARCH_USERS, RELATIONS_ERROR } from './relations.types';
+import { GET_RELATIONS, GET_FRIENDS, GET_USERS, SEND_REQUEST, ACCEPT_REQUEST, DECLINE_UNFRIEND, SEARCH_USERS, RELATIONS_ERROR, RESET_SEARCH } from './relations.types';
 
 // *************************** GET RELATIONS *************************** //
 export const getAllRelations = () => async (dispatch) => {
@@ -130,6 +130,18 @@ export const setSearchField = (text) => (dispatch) => {
     dispatch({
       type: SEARCH_USERS,
       payload: text,
+    });
+  } catch (err) {
+    console.error(err)
+  };
+};
+
+// ********************** RESET SEARCH USERS FIELD ********************* //
+export const resetSearchField = () => (dispatch) => {
+  try {
+    dispatch({
+      type: RESET_SEARCH,
+      payload: '',
     });
   } catch (err) {
     console.error(err)

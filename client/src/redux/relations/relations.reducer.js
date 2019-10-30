@@ -1,4 +1,4 @@
-import { GET_RELATIONS, GET_FRIENDS, GET_USERS, SEND_REQUEST, ACCEPT_REQUEST, DECLINE_UNFRIEND, SEARCH_USERS, RELATIONS_ERROR } from './relations.types';
+import { GET_RELATIONS, GET_FRIENDS, RESET_SEARCH, GET_USERS, SEND_REQUEST, ACCEPT_REQUEST, DECLINE_UNFRIEND, SEARCH_USERS, RELATIONS_ERROR } from './relations.types';
 
 const INITIAL_STATE = {
   friendsList: [],
@@ -49,6 +49,12 @@ export const relationsReducer = (state = INITIAL_STATE, action) => {
         searchField: action.payload,
         loading: false,
       };
+    case RESET_SEARCH:
+      return {
+        ...state,
+        searchField: action.payload,
+        loading: false,
+      }
     case RELATIONS_ERROR : 
       return {
         ...state,
